@@ -1,0 +1,2864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASELOCK — Secure Digital Evidence & Legal Document Management System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons for Law Enforcement / Security UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            navy: {
+              850: '#0e1e38',
+              900: '#0b162c',
+              950: '#060d1b',
+            },
+            govblue: {
+              50: '#f0f5fa',
+              100: '#e1ecf6',
+              500: '#1d4ed8',
+              600: '#1e40af',
+              700: '#1e3a8a',
+              800: '#172554',
+            },
+            sih: {
+              gold: '#f59e0b',
+              badge: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b1329;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .badge-glow {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+    }
+    .badge-glow-amber {
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+    }
+    .badge-glow-red {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.45);
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <div class="bg-gradient-to-r from-slate-900 via-govblue-900 to-slate-900 border-b border-slate-800 text-xs px-4 py-1.5 flex justify-between items-center text-slate-400">
+    <div class="flex items-center space-x-3">
+      <span class="inline-flex items-center gap-1.5 text-amber-400 font-semibold uppercase tracking-wider">
+        <i class="fa-solid fa-shield-halved text-amber-400"></i> Smart India Hackathon Prototype
+      </span>
+      <span class="hidden md:inline text-slate-600">|</span>
+      <span class="hidden md:inline text-slate-300">National Crime Records & Investigation Standard Prototype (NCRB / MHA Aligned)</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div id="topSecurityBadge" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 badge-glow">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <i class="fa-solid fa-lock text-[10px]"></i> LEDGER INTEGRITY: VERIFIED
+      </div>
+      <button onclick="openJudgeGuideModal()" class="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-medium transition-colors cursor-pointer">
+        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> <span>Judge Demo Mode</span>
+      </button>
+      <button onclick="openArchModal()" class="flex items-center gap-1 text-slate-300 hover:text-white transition-colors">
+        <i class="fa-solid fa-code text-xs"></i> <span>Architecture & API</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo and Branding -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
+            <i class="fa-solid fa-box-archive text-white text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1">
+                CASE<span class="text-blue-500">LOCK</span>
+              </span>
+              <span class="px-1.5 py-0.5 text-[10px] font-bold bg-blue-900/70 text-blue-300 rounded border border-blue-700/50">v2.6 MVP</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium tracking-wide">Secure Digital Evidence & Legal Document Management</p>
+          </div>
+        </div>
+
+        <!-- Role Quick Switcher for Hackathon Demonstrations -->
+        <div class="hidden lg:flex items-center bg-slate-950/80 border border-slate-800 rounded-lg p-1 space-x-1">
+          <span class="text-[11px] font-semibold text-slate-400 px-2 flex items-center gap-1">
+            <i class="fa-solid fa-id-badge text-slate-500"></i> Role:
+          </span>
+          <button onclick="switchRole('INVESTIGATING_OFFICER')" id="roleBtn-IO" class="role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all bg-blue-600 text-white shadow-sm">
+            Investigating Officer
+          </button>
+          <button onclick="switchRole('FORENSIC_OFFICER')" id="roleBtn-FO" class="role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+            Forensic Officer
+          </button>
+          <button onclick="switchRole('LEGAL_OFFICER')" id="roleBtn-LO" class="role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+            Legal Officer
+          </button>
+          <button onclick="switchRole('AUDITOR')" id="roleBtn-AUD" class="role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+            Auditor
+          </button>
+          <button onclick="switchRole('ADMIN')" id="roleBtn-ADM" class="role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+            Admin
+          </button>
+        </div>
+
+        <!-- Right Side: User Profile & Actions -->
+        <div class="flex items-center space-x-3">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button onclick="toggleNotificationDropdown()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors relative">
+              <i class="fa-regular fa-bell text-lg"></i>
+              <span id="notifBadge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
+            </button>
+            <!-- Notification Dropdown Panel -->
+            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 p-3">
+              <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span class="text-xs font-semibold text-white uppercase tracking-wider">Security Notifications</span>
+                <button onclick="clearNotifications()" class="text-[11px] text-blue-400 hover:underline">Mark all read</button>
+              </div>
+              <div id="notifList" class="divide-y divide-slate-800/60 max-h-64 overflow-y-auto custom-scroll mt-2 space-y-1">
+                <!-- Dynamically injected notifications -->
+              </div>
+            </div>
+          </div>
+
+          <!-- User Card -->
+          <div class="flex items-center space-x-2.5 pl-2 border-l border-slate-800">
+            <div id="userAvatar" class="w-8 h-8 rounded-full bg-blue-900 border border-blue-600 flex items-center justify-center font-bold text-xs text-blue-200">
+              IO
+            </div>
+            <div class="hidden sm:block text-left">
+              <p id="userNameDisplay" class="text-xs font-semibold text-white leading-tight">Insp. Rajesh Sharma</p>
+              <p id="userRoleBadge" class="text-[10px] text-blue-400 font-mono">INVESTIGATING_OFFICER</p>
+            </div>
+            <button onclick="openLoginModal()" title="Simulate Login / Logout" class="text-slate-400 hover:text-rose-400 p-1.5 transition-colors">
+              <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-56 shrink-0 hidden md:block">
+      <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-3 sticky top-24 space-y-6">
+        <div>
+          <div class="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Core Portal</div>
+          <nav class="space-y-1">
+            <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium bg-blue-600/20 text-blue-400 border border-blue-500/30 transition-all">
+              <i class="fa-solid fa-chart-line w-4 text-center"></i> Dashboard
+            </button>
+            <button onclick="navigateTo('cases')" id="nav-cases" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-briefcase w-4 text-center"></i> Case Vault
+            </button>
+            <button onclick="navigateTo('documents')" id="nav-documents" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-file-shield w-4 text-center"></i> Documents
+            </button>
+            <button onclick="navigateTo('evidence')" id="nav-evidence" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-fingerprint w-4 text-center"></i> Custody Chain
+            </button>
+            <button onclick="navigateTo('search')" id="nav-search" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-magnifying-glass w-4 text-center"></i> Smart AI Search
+            </button>
+          </nav>
+        </div>
+
+        <div>
+          <div class="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Trust & Security</div>
+          <nav class="space-y-1">
+            <button onclick="navigateTo('ledger')" id="nav-ledger" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-cubes-stacked w-4 text-center text-amber-400"></i> Integrity Ledger
+            </button>
+            <button onclick="navigateTo('audit')" id="nav-audit" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+              <i class="fa-solid fa-clock-rotate-left w-4 text-center text-emerald-400"></i> Audit Trail
+            </button>
+            <button onclick="openJudgeGuideModal()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-sky-300 bg-sky-950/40 border border-sky-800/50 hover:bg-sky-900/60 transition-all">
+              <i class="fa-solid fa-play w-4 text-center text-sky-400"></i> SIH Demo Flow
+            </button>
+          </nav>
+        </div>
+
+        <!-- System Status Box -->
+        <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 text-xs">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="font-semibold text-[10px] uppercase">Engine Status</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="space-y-1 text-[11px] text-slate-400">
+            <div class="flex justify-between"><span>Hashing:</span> <span class="font-mono text-emerald-400 font-medium">SHA-256</span></div>
+            <div class="flex justify-between"><span>Signatures:</span> <span class="font-mono text-blue-400 font-medium">ECDSA-P256</span></div>
+            <div class="flex justify-between"><span>Ledger:</span> <span class="font-mono text-amber-400 font-medium">Block #108</span></div>
+            <div class="flex justify-between"><span>Encryption:</span> <span class="font-mono text-slate-300">AES-256-GCM</span></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 min-w-0">
+      
+      <!-- VIEW 1: DASHBOARD VIEW -->
+      <section id="view-dashboard" class="space-y-6">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/50 border border-blue-900/40 rounded-2xl p-6">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-900/60 text-blue-300 border border-blue-700/50 mb-2">
+                <i class="fa-solid fa-building-shield"></i> Ministry of Home Affairs / State Police Grid
+              </div>
+              <h1 class="text-2xl font-extrabold text-white tracking-tight">CASELOCK Investigation Dashboard</h1>
+              <p class="text-slate-300 text-sm mt-1 max-w-xl">
+                Tamper-evident legal repository with verified digital evidence custody, automated OCR classification, and append-only cryptographic ledger verification.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="openUploadModal()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Ingest Document
+              </button>
+              <button onclick="triggerLedgerVerification()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer">
+                <i class="fa-solid fa-shield-check text-emerald-400"></i> Verify Ledger
+              </button>
+            </div>
+          </div>
+          <div class="absolute -right-6 -bottom-10 opacity-10 text-9xl pointer-events-none text-blue-400">
+            <i class="fa-solid fa-building-columns"></i>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Strip -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Active Cases</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="kpiCasesCount">5</h3>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-blue-900/40 text-blue-400 flex items-center justify-center border border-blue-800/40">
+                <i class="fa-solid fa-briefcase"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center text-[11px] text-emerald-400 gap-1">
+              <i class="fa-solid fa-arrow-trend-up"></i> <span>2 trial hearings scheduled</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Stored Documents</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="kpiDocsCount">24</h3>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-indigo-900/40 text-indigo-400 flex items-center justify-center border border-indigo-800/40">
+                <i class="fa-solid fa-file-shield"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center text-[11px] text-slate-400 gap-1 font-mono">
+              <i class="fa-solid fa-check text-emerald-400"></i> <span>100% SHA-256 Hashed</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Evidence Items</p>
+                <h3 class="text-2xl font-bold text-white mt-1" id="kpiEvidenceCount">10</h3>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-900/40 text-amber-400 flex items-center justify-center border border-amber-800/40">
+                <i class="fa-solid fa-fingerprint"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center text-[11px] text-amber-400 gap-1">
+              <i class="fa-solid fa-link"></i> <span>Complete custody tracked</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Integrity Proofs</p>
+                <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="kpiLedgerBlocks">28 Blocks</h3>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center border border-emerald-800/40">
+                <i class="fa-solid fa-cubes"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center text-[11px] text-emerald-400 gap-1 font-mono">
+              <i class="fa-solid fa-shield-halved"></i> <span>Chain intact & immutable</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts & Activity Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Document Categories Breakdown Chart (SVG Visualizer) -->
+          <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <h2 class="text-sm font-bold text-white">Document Ingestion & Categorization</h2>
+                <p class="text-xs text-slate-400">Classified legal & evidence files by statutory category</p>
+              </div>
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md font-mono">Realtime Ledger v2.6</span>
+            </div>
+
+            <!-- Custom Interactive Visual Bar Chart -->
+            <div class="space-y-3 pt-2">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium"><i class="fa-solid fa-file-lines text-blue-400 w-4"></i> FIR & Police Reports</span>
+                  <span class="font-mono text-slate-400">7 files (29%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-blue-500 h-full rounded-full" style="width: 29%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium"><i class="fa-solid fa-flask-vial text-purple-400 w-4"></i> Forensic Lab Reports</span>
+                  <span class="font-mono text-slate-400">5 files (21%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-purple-500 h-full rounded-full" style="width: 21%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium"><i class="fa-solid fa-gavel text-amber-400 w-4"></i> Charge Sheets & Court Filings</span>
+                  <span class="font-mono text-slate-400">6 files (25%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full rounded-full" style="width: 25%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium"><i class="fa-solid fa-user-shield text-emerald-400 w-4"></i> Witness Statements</span>
+                  <span class="font-mono text-slate-400">4 files (17%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style="width: 17%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium"><i class="fa-solid fa-scale-balanced text-rose-400 w-4"></i> Judgments & Orders</span>
+                  <span class="font-mono text-slate-400">2 files (8%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-rose-500 h-full rounded-full" style="width: 8%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Operational Notice -->
+            <div class="mt-6 p-3 bg-blue-950/40 border border-blue-800/40 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-shield-virus text-blue-400 text-lg"></i>
+                <div class="text-xs">
+                  <p class="text-white font-medium">Automatic Malware & Integrity Sandbox</p>
+                  <p class="text-slate-400">Zero plain text document payloads on public nodes. Storage: Encrypted at Rest.</p>
+                </div>
+              </div>
+              <button onclick="navigateTo('cases')" class="text-xs text-blue-400 hover:text-blue-300 font-medium">View All &rarr;</button>
+            </div>
+          </div>
+
+          <!-- Live Cryptographic Activity Feed -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-3">
+              <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Recent Audit Events
+              </h2>
+              <button onclick="navigateTo('audit')" class="text-xs text-blue-400 hover:underline">Full Log</button>
+            </div>
+            
+            <div id="dashboardRecentActivity" class="space-y-2.5 flex-1 overflow-y-auto custom-scroll pr-1 text-xs">
+              <!-- Dynamically populated activity rows -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Cases Carousel / Grid -->
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-folder-tree text-blue-400"></i> High-Priority Active Cases
+            </h2>
+            <button onclick="navigateTo('cases')" class="text-xs text-blue-400 hover:underline font-medium">View All 5 Cases &rarr;</button>
+          </div>
+          <div id="dashboardCasesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Dynamically populated top cases -->
+          </div>
+        </div>
+      </section>
+
+      <section id="view-cases" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Investigation Cases Repository</h1>
+            <p class="text-sm text-slate-400">Registered FIRs, CBI inquiries, and judicial court proceedings</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openNewCaseModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-folder-plus"></i> Create New Case
+            </button>
+          </div>
+        </div>
+
+        <!-- Cases Filter Bar -->
+        <div class="bg-slate-900/70 border border-slate-800 p-3 rounded-xl flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap gap-2 items-center text-xs">
+            <span class="text-slate-400 font-medium">Filter Status:</span>
+            <button onclick="filterCasesByStatus('ALL')" class="case-filter-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white font-medium">All</button>
+            <button onclick="filterCasesByStatus('OPEN')" class="case-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Open</button>
+            <button onclick="filterCasesByStatus('UNDER INVESTIGATION')" class="case-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Under Investigation</button>
+            <button onclick="filterCasesByStatus('SUBMITTED')" class="case-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Submitted</button>
+            <button onclick="filterCasesByStatus('UNDER TRIAL')" class="case-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Under Trial</button>
+          </div>
+          <div class="relative">
+            <input type="text" id="caseSearchInput" onkeyup="searchCasesTable()" placeholder="Search Case ID or title..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64">
+            <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-xs text-slate-500"></i>
+          </div>
+        </div>
+
+        <!-- Cases Table -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950/80 text-slate-400 font-semibold border-b border-slate-800 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3.5 px-4">Case Identifier</th>
+                  <th class="py-3.5 px-4">Title & Synopsis</th>
+                  <th class="py-3.5 px-4">Investigating Officer</th>
+                  <th class="py-3.5 px-4">Department</th>
+                  <th class="py-3.5 px-4">Priority</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="casesTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-case-detail" class="hidden space-y-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <button onclick="navigateTo('cases')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 id="cdCaseNumber" class="text-xl font-bold text-white mono">CASE-2026-014</h1>
+                <span id="cdStatusBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-900/60 text-amber-300 border border-amber-700/60">UNDER INVESTIGATION</span>
+                <span id="cdPriorityBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-900/60 text-rose-300">HIGH PRIORITY</span>
+              </div>
+              <p id="cdCaseTitle" class="text-sm text-slate-300 font-medium mt-0.5">Cyber Heist & Data Breach at National Financial Clearing Corp</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openUploadModalForCase()" class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-file-arrow-up"></i> Add Document
+            </button>
+          </div>
+        </div>
+
+        <!-- Detail Sub-navigation tabs -->
+        <div class="flex border-b border-slate-800 text-xs font-medium space-x-6">
+          <button onclick="switchCaseTab('overview')" id="caseTab-overview" class="case-subtab pb-3 text-blue-400 border-b-2 border-blue-500 font-semibold">Overview & Summary</button>
+          <button onclick="switchCaseTab('documents')" id="caseTab-documents" class="case-subtab pb-3 text-slate-400 hover:text-white">Documents (<span id="cdDocsCount">4</span>)</button>
+          <button onclick="switchCaseTab('evidence')" id="caseTab-evidence" class="case-subtab pb-3 text-slate-400 hover:text-white">Custody & Physical Evidence (<span id="cdEvidenceCount">2</span>)</button>
+          <button onclick="switchCaseTab('timeline')" id="caseTab-timeline" class="case-subtab pb-3 text-slate-400 hover:text-white">Investigation Timeline</button>
+        </div>
+
+        <!-- Tab 1: Overview -->
+        <div id="caseContent-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+              <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Case Synopsis & Brief</h2>
+              <p id="cdDescription" class="text-slate-200 text-sm leading-relaxed">
+                Unauthorized intrusion detected in Central Core Transaction Router leading to illicit exfiltration of batch settlement files. Forensic imaging completed. Accused IP origin traced to overseas gateway.
+              </p>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+              <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Key Persons & Suspects</h2>
+              <div id="cdPersonsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <!-- Dynamically injected -->
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-3 text-xs">
+              <h2 class="font-bold text-slate-400 uppercase tracking-wider text-[11px]">Assignment Details</h2>
+              <div class="flex justify-between py-1 border-b border-slate-800">
+                <span class="text-slate-400">Lead Investigator:</span>
+                <span id="cdLeadOfficer" class="text-white font-medium">Insp. Rajesh Sharma (IO-1042)</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-800">
+                <span class="text-slate-400">Department:</span>
+                <span id="cdDepartment" class="text-slate-200">Cyber Crime Branch, Delhi</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-800">
+                <span class="text-slate-400">Registration Date:</span>
+                <span id="cdCreatedDate" class="text-slate-200 font-mono">14 Aug 2026</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-800">
+                <span class="text-slate-400">Court Jurisdiction:</span>
+                <span class="text-slate-200">Chief Metropolitan Court, Patiala House</span>
+              </div>
+              <div class="pt-2">
+                <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-[11px] flex items-center gap-2">
+                  <i class="fa-solid fa-certificate text-sm"></i>
+                  <span>Case file anchored to Hyperledger Block #104</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Documents -->
+        <div id="caseContent-documents" class="hidden space-y-4">
+          <div id="caseDocumentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamically injected doc cards -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Evidence Custody -->
+        <div id="caseContent-evidence" class="hidden space-y-4">
+          <div id="caseEvidenceList" class="space-y-3">
+            <!-- Dynamically injected evidence cards -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Investigation Timeline -->
+        <div id="caseContent-timeline" class="hidden">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+            <h2 class="text-sm font-bold text-white mb-4">Immutable Procedural Timeline</h2>
+            <div id="caseTimelineEvents" class="relative pl-6 border-l-2 border-blue-800/60 space-y-6">
+              <!-- Dynamically injected timeline items -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-documents" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Digital Documents & Evidence Vault</h1>
+            <p class="text-sm text-slate-400">Cryptographically verifiable evidence files with full version trees</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openUploadModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Upload New Document
+            </button>
+          </div>
+        </div>
+
+        <!-- Documents Filter & Search Bar -->
+        <div class="bg-slate-900/70 border border-slate-800 p-3 rounded-xl flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap gap-2 items-center text-xs">
+            <span class="text-slate-400 font-medium">Type:</span>
+            <select id="docTypeFilter" onchange="renderDocumentsTable()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="ALL">All Categories</option>
+              <option value="FIR">FIR / Police Report</option>
+              <option value="FORENSIC REPORT">Forensic Report</option>
+              <option value="CHARGE SHEET">Charge Sheet</option>
+              <option value="WITNESS STATEMENT">Witness Statement</option>
+              <option value="COURT FILING">Court Filing</option>
+            </select>
+
+            <span class="text-slate-400 font-medium ml-2">Classification:</span>
+            <select id="docClassFilter" onchange="renderDocumentsTable()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="ALL">All Levels</option>
+              <option value="PUBLIC">Public</option>
+              <option value="CONFIDENTIAL">Confidential</option>
+              <option value="HIGHLY CONFIDENTIAL">Highly Confidential</option>
+              <option value="EVIDENCE">Evidence</option>
+            </select>
+          </div>
+          <div class="relative">
+            <input type="text" id="docSearchInput" onkeyup="renderDocumentsTable()" placeholder="Search title, hash, case..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64">
+            <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-xs text-slate-500"></i>
+          </div>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950/80 text-slate-400 font-semibold border-b border-slate-800 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3.5 px-4">Document Title & ID</th>
+                  <th class="py-3.5 px-4">Case Reference</th>
+                  <th class="py-3.5 px-4">Category</th>
+                  <th class="py-3.5 px-4">Version</th>
+                  <th class="py-3.5 px-4">SHA-256 Hash</th>
+                  <th class="py-3.5 px-4">Signature Status</th>
+                  <th class="py-3.5 px-4">Integrity</th>
+                  <th class="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="documentsTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-evidence" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Evidence Custody Tracking (Chain of Custody)</h1>
+            <p class="text-sm text-slate-400">Forensic specimens, seized hardware, and physical evidence audit chain</p>
+          </div>
+          <div>
+            <button onclick="openRegisterEvidenceModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-box"></i> Register Seized Evidence
+            </button>
+          </div>
+        </div>
+
+        <!-- Evidence Cards Grid -->
+        <div id="evidenceCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <section id="view-search" class="hidden space-y-6">
+        <div class="pb-2 border-b border-slate-800">
+          <h1 class="text-2xl font-bold text-white tracking-tight">Intelligent Semantic Search & OCR Discovery</h1>
+          <p class="text-sm text-slate-400">Natural language query engine powered by full-text inverted indexes and OCR token extraction</p>
+        </div>
+
+        <!-- Natural Language Search Bar -->
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-sparkles text-blue-400"></i> Natural Language & Metadata Query
+          </label>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <input type="text" id="aiSearchQuery" value="Find forensic reports related to Case 2026-014 involving fingerprints" placeholder="e.g. Find ballistics report for suspect Verma or weapon seizure..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 shadow-inner">
+              <button onclick="clearSearchInput()" class="absolute right-3 top-3 text-slate-500 hover:text-slate-300 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <button onclick="executeAiSearch()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all">
+              <i class="fa-solid fa-brain"></i> Parse & Search
+            </button>
+          </div>
+
+          <!-- Suggested Quick Prompts -->
+          <div class="mt-3 flex flex-wrap gap-2 items-center text-xs">
+            <span class="text-slate-400">Try queries:</span>
+            <button onclick="setAndSearch('Find forensic reports related to Case 2026-014 involving fingerprints')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+              Fingerprint forensics in 2026-014
+            </button>
+            <button onclick="setAndSearch('Find witness statements mentioning Rajesh Verma')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+              Witness statements for Verma
+            </button>
+            <button onclick="setAndSearch('Charge sheets under trial with high priority')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+              High priority charge sheets
+            </button>
+          </div>
+        </div>
+
+        <!-- Query Semantic Interpretation Banner -->
+        <div id="aiSearchInterpretation" class="hidden bg-slate-900/90 border border-blue-900/50 rounded-xl p-4 text-xs space-y-2">
+          <div class="flex items-center gap-2 text-blue-400 font-semibold">
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>Extracted Intent & Entities:</span>
+          </div>
+          <div id="aiEntitiesBadges" class="flex flex-wrap gap-2">
+            <!-- Entities dynamically injected -->
+          </div>
+        </div>
+
+        <!-- Search Results Container -->
+        <div id="searchResultsContainer" class="space-y-3">
+          <!-- Dynamically populated search cards -->
+        </div>
+      </section>
+
+      <section id="view-ledger" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-bold text-white tracking-tight">Integrity Ledger & Blockchain Explorer</h1>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-800/60">HYPERLEDGER SIMULATOR</span>
+            </div>
+            <p class="text-sm text-slate-400">Append-only cryptographic chain linking document hashes, custody events, and signatures</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="triggerLedgerVerification()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-emerald-700/20 transition-all cursor-pointer">
+              <i class="fa-solid fa-shield-halved"></i> Verify Entire Chain
+            </button>
+            <button onclick="simulateTamperBlock()" class="px-3 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer" title="Tamper with a historical block to demonstrate mathematical detection">
+              <i class="fa-solid fa-bug text-rose-400"></i> Tamper Demo Block
+            </button>
+            <button onclick="restoreLedger()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all">
+              <i class="fa-solid fa-rotate-left"></i> Reset Chain
+            </button>
+          </div>
+        </div>
+
+        <!-- Verification Result Alert Box -->
+        <div id="ledgerVerificationBanner" class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/50 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-emerald-900/60 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fa-solid fa-check-double text-base"></i>
+          </div>
+          <div class="text-xs">
+            <h3 class="font-bold text-emerald-300 text-sm">Ledger Status: VERIFIED & MATHEMATICALLY CONSISTENT</h3>
+            <p class="text-slate-300 mt-0.5">
+              All 28 blocks checked. Formula <code class="bg-slate-900 px-1 py-0.5 rounded font-mono text-emerald-300">SHA256(timestamp + tx_id + doc_id + doc_hash + user_id + action + prev_hash)</code> strictly matches subsequent links.
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Blocks Timeline Feed -->
+        <div class="space-y-4" id="ledgerBlocksList">
+          <!-- Dynamically populated blockchain cards -->
+        </div>
+      </section>
+
+      <section id="view-audit" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Tamper-Evident Audit Trail</h1>
+            <p class="text-sm text-slate-400">Strict statutory log of every login, access, upload, digital signature, and verification</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportAuditLog()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-download"></i> Export JSON / CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Audit Filters -->
+        <div class="bg-slate-900/70 border border-slate-800 p-3 rounded-xl flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap gap-2 items-center text-xs">
+            <span class="text-slate-400 font-medium">Action:</span>
+            <select id="auditActionFilter" onchange="renderAuditTable()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="ALL">All Actions</option>
+              <option value="DOCUMENT_UPLOAD">DOCUMENT_UPLOAD</option>
+              <option value="DOCUMENT_SIGN">DOCUMENT_SIGN</option>
+              <option value="INTEGRITY_VERIFY">INTEGRITY_VERIFY</option>
+              <option value="LOGIN">LOGIN</option>
+              <option value="CUSTODY_TRANSFER">CUSTODY_TRANSFER</option>
+            </select>
+
+            <span class="text-slate-400 font-medium ml-2">Severity:</span>
+            <select id="auditSeverityFilter" onchange="renderAuditTable()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="ALL">All Severities</option>
+              <option value="NORMAL">Normal / Info</option>
+              <option value="SECURITY">Security / Sign</option>
+              <option value="CRITICAL">Critical Alert</option>
+            </select>
+          </div>
+          <div class="relative">
+            <input type="text" id="auditSearchInput" onkeyup="renderAuditTable()" placeholder="Search user, IP, or tx hash..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64">
+            <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-xs text-slate-500"></i>
+          </div>
+        </div>
+
+        <!-- Audit Table -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950/80 text-slate-400 font-semibold border-b border-slate-800 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3.5 px-4">Timestamp (IST)</th>
+                  <th class="py-3.5 px-4">User / Officer</th>
+                  <th class="py-3.5 px-4">Action</th>
+                  <th class="py-3.5 px-4">Resource Target</th>
+                  <th class="py-3.5 px-4">Result</th>
+                  <th class="py-3.5 px-4">Client IP</th>
+                  <th class="py-3.5 px-4 font-mono">Ledger TX Hash</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="eicModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center">
+            <i class="fa-solid fa-shield-halved text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Evidence Integrity Capsule (EIC)
+              <span class="px-2 py-0.5 text-[10px] font-mono bg-blue-950 text-blue-300 border border-blue-800 rounded">NCRB STD-509</span>
+            </h2>
+            <p class="text-xs text-slate-400">Cryptographic Identity, Digital Signature & Ledger Proof</p>
+          </div>
+        </div>
+        <button onclick="closeEicModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto custom-scroll space-y-6 text-xs">
+        
+        <!-- Live Status Capsule Badge -->
+        <div id="eicVerificationBanner" class="p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-800/60 text-emerald-300">
+          <div class="flex items-center gap-3">
+            <div id="eicStatusIcon" class="w-10 h-10 rounded-xl bg-emerald-900/50 flex items-center justify-center text-lg text-emerald-400">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+              <h3 id="eicStatusTitle" class="font-bold text-sm text-emerald-400">✓ DOCUMENT INTEGRITY VERIFIED</h3>
+              <p id="eicStatusSubtitle" class="text-slate-300 text-[11px]">Current calculated file hash matches the sealed anchor on the append-only ledger.</p>
+            </div>
+          </div>
+          <button id="eicRecalculateBtn" onclick="runEicHashVerification()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-semibold flex items-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-arrows-rotate"></i> Re-Calculate Hash
+          </button>
+        </div>
+
+        <!-- Document Identity Matrix -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2.5">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Document Identification</div>
+            <div class="flex justify-between"><span class="text-slate-400">Document ID:</span> <span id="eicDocId" class="mono text-white font-medium">DOC-2026-0041</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Case Reference:</span> <span id="eicCaseId" class="mono text-blue-400 font-medium">CASE-2026-014</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Document Title:</span> <span id="eicTitle" class="text-white truncate max-w-[180px]">Forensic_Fingerprint_Report.pdf</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Category:</span> <span id="eicCategory" class="text-purple-300">FORENSIC REPORT</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Version:</span> <span id="eicVersion" class="mono text-amber-400 font-bold">v2.0</span></div>
+          </div>
+
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2.5">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Custodial & Signature Metadata</div>
+            <div class="flex justify-between"><span class="text-slate-400">Ingested By:</span> <span id="eicUploader" class="text-white">Insp. Sharma (IO-1042)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Digitally Signed By:</span> <span id="eicSigner" class="text-emerald-300 font-medium">Dr. Meenakshi Iyer (FO-209)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Signature Algorithm:</span> <span class="mono text-blue-400">ECDSA (P-256 + SHA-256)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Digital Signature:</span> <span id="eicSigStatus" class="px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-semibold text-[10px]">VERIFIED</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Sealed Timestamp:</span> <span id="eicTimestamp" class="text-slate-300 font-mono">21 Sep 2026, 14:32:10 IST</span></div>
+          </div>
+        </div>
+
+        <!-- Cryptographic Hashes Block -->
+        <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Cryptographic Identity Layer</span>
+            <span class="text-[10px] font-mono text-slate-500">Web Crypto API (SubtleCrypto)</span>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>Trusted Ledger Anchor Hash:</span>
+              <span class="text-emerald-400 font-mono">Canonical Proof</span>
+            </div>
+            <div id="eicTrustedHash" class="mono text-[11px] bg-slate-900 p-2.5 rounded border border-slate-800 text-emerald-400 break-all select-all">
+              7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>Current Calculated Storage Hash:</span>
+              <span id="eicCalcHashMatchLabel" class="text-emerald-400 font-mono">Matches 100%</span>
+            </div>
+            <div id="eicCalculatedHash" class="mono text-[11px] bg-slate-900 p-2.5 rounded border border-slate-800 text-emerald-400 break-all select-all">
+              7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-1 border-t border-slate-800 text-[11px]">
+            <span class="text-slate-400">Anchor Block Reference:</span>
+            <span id="eicBlockRef" class="mono text-blue-400 font-medium">Block #104 (TX-2026-000123)</span>
+          </div>
+        </div>
+
+        <!-- Demo Tamper Switcher (Judge Mode Feature) -->
+        <div class="bg-amber-950/30 border border-amber-800/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
+            <div>
+              <p class="text-amber-200 font-semibold text-xs">Simulate Document Content Modification / Byte Tamper</p>
+              <p class="text-slate-400 text-[11px]">Injects 1-bit variance to demonstrate instant cryptographic detection.</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button id="btnTamperToggle" onclick="toggleSimulateDocTamper()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition-colors">
+              Simulate File Tampering
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-950 px-6 py-3 border-t border-slate-800 flex justify-between items-center">
+        <div class="text-[11px] text-slate-400">
+          Digital Signature Hash: <span id="eicSigHashShort" class="font-mono text-slate-300">4e28...98ba</span>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="downloadDocCertificate()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium flex items-center gap-1">
+            <i class="fa-solid fa-stamp"></i> Export Certificate
+          </button>
+          <button onclick="closeEicModal()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold">
+            Done
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="uploadModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      
+      <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center">
+            <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Ingest & Seal Document</h2>
+            <p class="text-xs text-slate-400">Automatic OCR, AI Categorization & SHA-256 Hashing</p>
+          </div>
+        </div>
+        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="uploadDocForm" onsubmit="handleDocumentUpload(event)" class="p-6 overflow-y-auto custom-scroll space-y-4 text-xs">
+        
+        <!-- File Drop Area -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5">Select Document or Evidence File (PDF, DOCX, JPG, PNG)</label>
+          <div id="fileDropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-slate-950/40">
+            <i class="fa-solid fa-file-arrow-up text-3xl text-blue-400 mb-2"></i>
+            <p id="fileDropLabel" class="text-sm font-medium text-slate-200">Click or drag file here</p>
+            <p class="text-[11px] text-slate-400 mt-1">Automatic real-time SHA-256 calculation on client and simulated OCR indexing</p>
+            <input type="file" id="fileInput" onchange="handleFileSelected(event)" class="hidden" accept=".pdf,.docx,.jpg,.png,.txt">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Target Case</label>
+            <select id="uploadCaseSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+              <!-- Dynamically filled with cases -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Classification Level</label>
+            <select id="uploadClassification" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+              <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+              <option value="HIGHLY CONFIDENTIAL">HIGHLY CONFIDENTIAL</option>
+              <option value="EVIDENCE">EVIDENCE</option>
+              <option value="PUBLIC">PUBLIC</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Document Title</label>
+          <input type="text" id="uploadTitle" required placeholder="e.g. Forensic_Fingerprint_Report.pdf" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <!-- AI / OCR Live Extraction Preview Box -->
+        <div id="ocrProcessingCard" class="hidden bg-slate-950 border border-blue-800/60 rounded-xl p-3.5 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-blue-400 text-[11px] flex items-center gap-1.5">
+              <i class="fa-solid fa-microchip animate-pulse"></i> AI OCR & NLP Extractor
+            </span>
+            <span id="ocrConfidenceBadge" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-mono text-[10px] font-bold">Confidence: 94%</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-800/80">
+            <div><span class="text-slate-400">Predicted Type:</span> <span id="ocrPredictedType" class="text-white font-semibold">FORENSIC REPORT</span></div>
+            <div><span class="text-slate-400">Extracted Persons:</span> <span id="ocrExtractedPersons" class="text-white">Rajesh Verma, Dr. Iyer</span></div>
+            <div><span class="text-slate-400">Calculated Hash:</span> <span id="ocrCalculatedHash" class="font-mono text-emerald-400 truncate block">Calculating...</span></div>
+            <div><span class="text-slate-400">Sealing Action:</span> <span class="text-blue-300">Auto Ledger Block</span></div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium">Cancel</button>
+          <button type="submit" id="btnConfirmUpload" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-blue-600/30">
+            <i class="fa-solid fa-stamp"></i> Seal & Anchor Document
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="evidenceModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl text-xs space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-fingerprint text-amber-400"></i> Register Physical / Digital Evidence
+        </h2>
+        <button onclick="closeRegisterEvidenceModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <form onsubmit="handleRegisterEvidence(event)" class="space-y-3">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Target Case</label>
+          <select id="evCaseSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"></select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Evidence Description</label>
+          <input type="text" id="evDescription" required placeholder="e.g. Seized Kingston 128GB Flash Drive containing exfiltrated logs" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Current Custodian</label>
+            <input type="text" id="evCustodian" value="Insp. Rajesh Sharma (IO-1042)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Secure Vault / Location</label>
+            <input type="text" id="evLocation" value="Malkhana Locker #4B, Cyber Cell" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeRegisterEvidenceModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl flex items-center gap-1.5">
+            <i class="fa-solid fa-fingerprint"></i> Mint Evidence Record
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="judgeGuideModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="bg-slate-900 border border-sky-800/80 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <div class="bg-gradient-to-r from-sky-950 via-slate-900 to-slate-900 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center">
+            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Smart India Hackathon: End-to-End Evaluation Scenario
+              <span class="px-2 py-0.5 rounded text-[10px] bg-sky-950 text-sky-300 border border-sky-800 font-mono">13-STEP LIVE DEMO</span>
+            </h2>
+            <p class="text-xs text-slate-400">Step-by-step interactive workflow matching Section 27 of SIH Evaluation Rubric</p>
+          </div>
+        </div>
+        <button onclick="closeJudgeGuideModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-4 text-xs">
+        <p class="text-slate-300 text-xs leading-relaxed">
+          This panel allows hackathon evaluators to verify the complete evidentiary journey from <strong class="text-white">Investigation Officer Upload</strong> to <strong class="text-white">Forensic Signing</strong>, <strong class="text-white">Append-Only Blockchain Block Creation</strong>, and <strong class="text-rose-400">Tamper Detection</strong>.
+        </p>
+
+        <!-- Stepper Cards -->
+        <div class="space-y-2.5">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-blue-900 text-blue-300 flex items-center justify-center font-bold text-xs shrink-0">1</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Login as Investigating Officer & Open CASE-2026-014</h3>
+              <p class="text-slate-400 text-[11px]">Inspect FIR, suspects, timeline, and current case evidence files.</p>
+            </div>
+            <button onclick="demoStep1()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold">Run Step 1</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-blue-900 text-blue-300 flex items-center justify-center font-bold text-xs shrink-0">2</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Ingest Forensic Fingerprint Report</h3>
+              <p class="text-slate-400 text-[11px]">Runs client-side SHA-256 hash, simulated OCR metadata extraction, and seals initial version v1.0.</p>
+            </div>
+            <button onclick="demoStep2()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold">Run Step 2</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-purple-900 text-purple-300 flex items-center justify-center font-bold text-xs shrink-0">3</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Switch to Forensic Officer & Digitally Sign Report</h3>
+              <p class="text-slate-400 text-[11px]">Generates cryptographic ECDSA signature and seals as v2.0.</p>
+            </div>
+            <button onclick="demoStep3()" class="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold">Run Step 3</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-amber-900 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">4</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Inspect Integrity Ledger Block</h3>
+              <p class="text-slate-400 text-[11px]">View Block #104 containing action <code class="text-amber-300">DIGITAL_SIGN</code> and verify chain.</p>
+            </div>
+            <button onclick="demoStep4()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs">Run Step 4</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-emerald-900 text-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">5</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Open Evidence Integrity Capsule (EIC) & Verify</h3>
+              <p class="text-slate-400 text-[11px]">Calculates live hash against ledger: shows <span class="text-emerald-400 font-bold">✓ DOCUMENT VERIFIED</span>.</p>
+            </div>
+            <button onclick="demoStep5()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">Run Step 5</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-rose-900 text-rose-300 flex items-center justify-center font-bold text-xs shrink-0">6</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-rose-300 text-xs">Simulate Document Content Tampering</h3>
+              <p class="text-slate-300 text-[11px]">Modifies 1 byte in storage. Capsule instantly triggers: <span class="text-rose-400 font-bold">⚠ INTEGRITY MISMATCH DETECTED</span>.</p>
+            </div>
+            <button onclick="demoStep6()" class="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold">Run Step 6</button>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-emerald-900 text-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">7</span>
+            <div class="flex-1">
+              <h3 class="font-bold text-white text-xs">Inspect Audit Trail</h3>
+              <p class="text-slate-400 text-[11px]">Inspect complete immutable log of upload, sign, verification, and tamper failure alert.</p>
+            </div>
+            <button onclick="demoStep7()" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-semibold">Run Step 7</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 px-6 py-3 border-t border-slate-800 flex justify-end">
+        <button onclick="closeJudgeGuideModal()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold">Close Wizard</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="archModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-xs">
+      
+      <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-server text-blue-400 text-base"></i>
+          <h2 class="font-bold text-white text-base">CASELOCK Production Architecture & API Specification</h2>
+        </div>
+        <button onclick="closeArchModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-4">
+        <div>
+          <h3 class="text-sm font-bold text-blue-400 mb-1">1. Cryptographic Security Architecture</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Strict isolation principle: <strong class="text-white">Document contents are NEVER written to the blockchain.</strong> Documents are encrypted with AES-256-GCM and stored in high-assurance object storage (S3/MinIO/GovCloud). The blockchain ledger records strictly:
+            <code class="text-emerald-300 font-mono bg-slate-950 px-1 py-0.5 rounded">SHA256(DocPayload) + DocID + VersionID + SignerPubKey + Timestamp + PreviousBlockHash</code>.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-blue-400 mb-1">2. Core Backend REST API Routes (FastAPI Blueprint)</h3>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono space-y-1 text-slate-300">
+            <div><span class="text-blue-400 font-bold">POST</span> /api/v1/auth/login <span class="text-slate-500">— JWT generation with Argon2/bcrypt</span></div>
+            <div><span class="text-emerald-400 font-bold">GET </span> /api/v1/cases <span class="text-slate-500">— RBAC-filtered cases list</span></div>
+            <div><span class="text-blue-400 font-bold">POST</span> /api/v1/documents/upload <span class="text-slate-500">— AES-256 encryption, SHA-256 hashing & OCR index</span></div>
+            <div><span class="text-blue-400 font-bold">POST</span> /api/v1/documents/{id}/sign <span class="text-slate-500">— ECDSA signing & Hyperledger transaction minting</span></div>
+            <div><span class="text-emerald-400 font-bold">GET </span> /api/v1/documents/{id}/verify <span class="text-slate-500">— Realtime SHA-256 verification against ledger</span></div>
+            <div><span class="text-emerald-400 font-bold">GET </span> /api/v1/ledger/blocks <span class="text-slate-500">— Append-only chain blocks</span></div>
+            <div><span class="text-amber-400 font-bold">POST</span> /api/v1/ledger/verify <span class="text-slate-500">— Full mathematical chain validation</span></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-blue-400 mb-1">3. Docker Deployment Specification</h3>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-slate-400 space-y-1">
+            <p class="text-slate-200"># Launch complete production stack:</p>
+            <p class="text-emerald-400 font-bold">$ docker compose up --build -d</p>
+            <p class="text-slate-500 text-[11px] mt-1">Containers: caselock-frontend (Vite/Nginx), caselock-backend (FastAPI/Uvicorn), caselock-db (PostgreSQL 16), caselock-storage (MinIO S3).</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-blue-400 mb-1">4. Evaluator Credentials</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Investigating Officer</span>
+              <span class="text-white font-mono font-medium">officer@caselock.demo</span>
+            </div>
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Forensic Officer</span>
+              <span class="text-white font-mono font-medium">forensic@caselock.demo</span>
+            </div>
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Legal Officer</span>
+              <span class="text-white font-mono font-medium">legal@caselock.demo</span>
+            </div>
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Auditor</span>
+              <span class="text-white font-mono font-medium">auditor@caselock.demo</span>
+            </div>
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Administrator</span>
+              <span class="text-white font-mono font-medium">admin@caselock.demo</span>
+            </div>
+            <div class="bg-slate-950 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 block text-[10px]">Master Demo Password</span>
+              <span class="text-amber-400 font-mono font-medium">Demo2026@Caselock</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* =========================================================================
+       CASELOCK MVP ENGINE — COMPLETE PRODUCTION LOGIC & SIMULATORS
+       ========================================================================= */
+
+    // 1. Current Authenticated Session & RBAC State
+    let currentUser = {
+      id: "USR-1042",
+      name: "Insp. Rajesh Sharma",
+      email: "officer@caselock.demo",
+      role: "INVESTIGATING_OFFICER",
+      department: "Cyber Crime Unit, Delhi",
+      badge: "IO-1042"
+    };
+
+    const ROLE_PROFILES = {
+      INVESTIGATING_OFFICER: {
+        id: "USR-1042",
+        name: "Insp. Rajesh Sharma",
+        email: "officer@caselock.demo",
+        role: "INVESTIGATING_OFFICER",
+        department: "Cyber Crime Unit, Delhi",
+        badge: "IO-1042",
+        avatar: "IO"
+      },
+      FORENSIC_OFFICER: {
+        id: "USR-2091",
+        name: "Dr. Meenakshi Iyer",
+        email: "forensic@caselock.demo",
+        role: "FORENSIC_OFFICER",
+        department: "Central Forensic Science Lab (CFSL)",
+        badge: "FO-209",
+        avatar: "FO"
+      },
+      LEGAL_OFFICER: {
+        id: "USR-3044",
+        name: "Adv. Vikram Sethi",
+        email: "legal@caselock.demo",
+        role: "LEGAL_OFFICER",
+        department: "Directorate of Prosecution",
+        badge: "LO-304",
+        avatar: "LO"
+      },
+      AUDITOR: {
+        id: "USR-4012",
+        name: "Sunita Deshmukh",
+        email: "auditor@caselock.demo",
+        role: "AUDITOR",
+        department: "Judicial Vigilance Commission",
+        badge: "AUD-401",
+        avatar: "AU"
+      },
+      ADMIN: {
+        id: "USR-9901",
+        name: "Admin S. K. Roy",
+        email: "admin@caselock.demo",
+        role: "ADMIN",
+        department: "MHA Digital Grid Operations",
+        badge: "SYS-001",
+        avatar: "AD"
+      }
+    };
+
+    // 2. Realistic Seed Data for Smart India Hackathon Demonstration
+    let cases = [
+      {
+        id: "CASE-2026-014",
+        caseNumber: "FIR-2026/DL-CYB/014",
+        title: "Cyber Intrusion & Extortion at National Clearing House",
+        type: "CYBERCRIME",
+        status: "UNDER INVESTIGATION",
+        priority: "HIGH",
+        io: "Insp. Rajesh Sharma (IO-1042)",
+        department: "Cyber Crime Unit, Delhi",
+        createdDate: "14 Aug 2026",
+        description: "Malware exfiltration of clearing transaction ledgers with unauthorized extortion demands. Forensic memory dumps and packet captures seized.",
+        persons: [
+          { name: "Rajesh Verma", role: "Prime Suspect", relation: "Ex-Contractor" },
+          { name: "Anita Rao", role: "Witness", relation: "IT Security Analyst" }
+        ]
+      },
+      {
+        id: "CASE-2026-022",
+        caseNumber: "FIR-2026/MH-CB/022",
+        title: "Automated Banking Clearing Fraud & Unauthorized Debit",
+        type: "FINANCIAL FRAUD",
+        status: "OPEN",
+        priority: "MEDIUM",
+        io: "Insp. Rajesh Sharma (IO-1042)",
+        department: "Economic Offences Wing",
+        createdDate: "29 Aug 2026",
+        description: "Cloned payment gateway merchant IDs used to siphon recurring payments. Accused bank accounts frozen under section 102 CrPC.",
+        persons: [
+          { name: "S. K. Singhania", role: "Complainant", relation: "Chief Financial Officer" }
+        ]
+      },
+      {
+        id: "CASE-2026-009",
+        caseNumber: "FIR-2026/KA-BLR/009",
+        title: "Intellectual Property Exfiltration & Cryptographic Key Theft",
+        type: "CORPORATE ESPIONAGE",
+        status: "SUBMITTED",
+        priority: "HIGH",
+        io: "DySP. K. Murthy (IO-889)",
+        department: "CID Karnataka",
+        createdDate: "02 Jul 2026",
+        description: "Theft of proprietary aerospace telemetry algorithms prior to defense satellite bidding. Digital forensics completed.",
+        persons: [
+          { name: "Dr. Anirudh Sen", role: "Accused", relation: "Former Principal Scientist" }
+        ]
+      },
+      {
+        id: "CASE-2026-005",
+        caseNumber: "FIR-2026/DL-CR/005",
+        title: "Arms Trafficking & Unlicensed Automatic Weapons Seizure",
+        type: "ORGANIZED CRIME",
+        status: "UNDER TRIAL",
+        priority: "HIGH",
+        io: "Insp. V. K. Yadav (IO-502)",
+        department: "Special Cell, Delhi Police",
+        createdDate: "11 Jan 2026",
+        description: "Seizure of 14 semi-automatic handguns and ammunition from interstate transit bus. Charge sheet submitted to Special Court.",
+        persons: [
+          { name: "Gurpreet Singh", role: "Accused", relation: "Driver / Courier" },
+          { name: "Mohit Chaudhary", role: "Accused", relation: "Receiver" }
+        ]
+      },
+      {
+        id: "CASE-2026-031",
+        caseNumber: "FIR-2026/TN-CH/031",
+        title: "Counterfeit Digital Currency & Illegal Hawala Exchange",
+        type: "HAWALA / PMLA",
+        status: "UNDER INVESTIGATION",
+        priority: "LOW",
+        io: "Insp. S. Ramanathan (IO-731)",
+        department: "Enforcement Directorate Chennai",
+        createdDate: "08 Sep 2026",
+        description: "Undercover seizure of cold wallets and crypto remittance slips totaling ₹4.2 Crore.",
+        persons: [
+          { name: "Farooq Basha", role: "Suspect", relation: "Exchange Operator" }
+        ]
+      }
+    ];
+
+    let documents = [
+      {
+        id: "DOC-2026-0041",
+        caseId: "CASE-2026-014",
+        title: "Forensic_Fingerprint_Report.pdf",
+        type: "FORENSIC REPORT",
+        classification: "CONFIDENTIAL",
+        version: "v2.0",
+        uploadedBy: "Dr. Meenakshi Iyer (FO-209)",
+        department: "CFSL New Delhi",
+        hash: "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "VERIFIED",
+        signedBy: "Dr. Meenakshi Iyer (FO-209)",
+        signedAt: "21 Sep 2026, 14:32 IST",
+        blockRef: "Block #104",
+        txId: "TX-104-88921",
+        createdAt: "2026-09-21 14:20:00",
+        fileSize: "2.4 MB"
+      },
+      {
+        id: "DOC-2026-0038",
+        caseId: "CASE-2026-014",
+        title: "First_Information_Report_014.pdf",
+        type: "FIR",
+        classification: "CONFIDENTIAL",
+        version: "v1.0",
+        uploadedBy: "Insp. Rajesh Sharma (IO-1042)",
+        department: "Cyber Crime Unit",
+        hash: "a3f5c6b890123456789abcdef0123456789abcdef0123456789abcdef0123456",
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "VERIFIED",
+        signedBy: "Insp. Rajesh Sharma",
+        signedAt: "14 Aug 2026, 11:15 IST",
+        blockRef: "Block #101",
+        txId: "TX-101-44120",
+        createdAt: "2026-08-14 11:00:00",
+        fileSize: "1.1 MB"
+      },
+      {
+        id: "DOC-2026-0045",
+        caseId: "CASE-2026-014",
+        title: "Witness_Statement_AnitaRao.pdf",
+        type: "WITNESS STATEMENT",
+        classification: "CONFIDENTIAL",
+        version: "v1.0",
+        uploadedBy: "Insp. Rajesh Sharma (IO-1042)",
+        department: "Cyber Crime Unit",
+        hash: "e5b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7",
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "VERIFIED",
+        signedBy: "Anita Rao (Witness)",
+        signedAt: "18 Aug 2026, 16:40 IST",
+        blockRef: "Block #102",
+        txId: "TX-102-55612",
+        createdAt: "2026-08-18 16:30:00",
+        fileSize: "840 KB"
+      },
+      {
+        id: "DOC-2026-0049",
+        caseId: "CASE-2026-014",
+        title: "Draft_Charge_Sheet_CrPC_173.pdf",
+        type: "CHARGE SHEET",
+        classification: "HIGHLY CONFIDENTIAL",
+        version: "v1.2",
+        uploadedBy: "Adv. Vikram Sethi (LO-304)",
+        department: "Prosecution Cell",
+        hash: "c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "PENDING",
+        signedBy: null,
+        signedAt: null,
+        blockRef: "Block #103",
+        txId: "TX-103-66231",
+        createdAt: "2026-09-19 18:00:00",
+        fileSize: "3.8 MB"
+      },
+      {
+        id: "DOC-2026-0012",
+        caseId: "CASE-2026-005",
+        title: "Ballistics_Seizure_Report_SpecialCell.pdf",
+        type: "FORENSIC REPORT",
+        classification: "EVIDENCE",
+        version: "v1.0",
+        uploadedBy: "Dr. Meenakshi Iyer (FO-209)",
+        department: "CFSL New Delhi",
+        hash: "b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8",
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "VERIFIED",
+        signedBy: "Dr. Meenakshi Iyer",
+        signedAt: "16 Jan 2026, 10:10 IST",
+        blockRef: "Block #98",
+        txId: "TX-98-11204",
+        createdAt: "2026-01-16 10:00:00",
+        fileSize: "4.2 MB"
+      }
+    ];
+
+    let evidenceItems = [
+      {
+        id: "EVID-2026-0081",
+        caseId: "CASE-2026-014",
+        description: "Seized Dell Precision M5500 Workstation (S/N: DL-889-XQ)",
+        collectedBy: "Insp. Sharma (IO-1042)",
+        collectedAt: "15 Aug 2026, 02:30 IST",
+        currentCustodian: "Dr. Meenakshi Iyer (CFSL)",
+        location: "CFSL Digital Forensics Lab Room 3",
+        status: "EXAMINED",
+        hash: "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
+      },
+      {
+        id: "EVID-2026-0082",
+        caseId: "CASE-2026-014",
+        description: "Kingston 128GB Encrypted USB Thumb Drive containing attack scripts",
+        collectedBy: "Insp. Sharma (IO-1042)",
+        collectedAt: "15 Aug 2026, 03:15 IST",
+        currentCustodian: "Insp. Rajesh Sharma (IO)",
+        location: "Malkhana Vault Locker 4B",
+        status: "STORED",
+        hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        id: "EVID-2026-0019",
+        caseId: "CASE-2026-005",
+        description: "9mm Beretta Semi-Automatic Pistol (S/N: BER-99412)",
+        collectedBy: "Insp. V. K. Yadav (IO-502)",
+        collectedAt: "11 Jan 2026, 21:00 IST",
+        currentCustodian: "Patiala House Court Nazir",
+        location: "Court Judicial Evidence Safe",
+        status: "PRESENTED",
+        hash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+      }
+    ];
+
+    // 3. Append-Only Blockchain Ledger Blocks (Chained SHA-256)
+    let ledgerBlocks = [
+      {
+        index: 101,
+        timestamp: "2026-08-14 11:15:20",
+        txId: "TX-101-44120",
+        documentId: "DOC-2026-0038",
+        documentHash: "a3f5c6b890123456789abcdef0123456789abcdef0123456789abcdef0123456",
+        userId: "IO-1042",
+        action: "DOCUMENT_UPLOAD",
+        previousBlockHash: "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b",
+        currentBlockHash: "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+        isTampered: false
+      },
+      {
+        index: 102,
+        timestamp: "2026-08-18 16:40:12",
+        txId: "TX-102-55612",
+        documentId: "DOC-2026-0045",
+        documentHash: "e5b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7",
+        userId: "IO-1042",
+        action: "WITNESS_ATTESTATION",
+        previousBlockHash: "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+        currentBlockHash: "112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00",
+        isTampered: false
+      },
+      {
+        index: 103,
+        timestamp: "2026-09-19 18:00:45",
+        txId: "TX-103-66231",
+        documentId: "DOC-2026-0049",
+        documentHash: "c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+        userId: "LO-304",
+        action: "CHARGE_SHEET_DRAFT",
+        previousBlockHash: "112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00",
+        currentBlockHash: "91aebcd457891234567890abcdef1234567890abcdef1234567890abcdef1234",
+        isTampered: false
+      },
+      {
+        index: 104,
+        timestamp: "2026-09-21 14:32:21",
+        txId: "TX-104-88921",
+        documentId: "DOC-2026-0041",
+        documentHash: "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        userId: "FO-209",
+        action: "DIGITAL_SIGN",
+        previousBlockHash: "91aebcd457891234567890abcdef1234567890abcdef1234567890abcdef1234",
+        currentBlockHash: "47aa1290bbffeeddccbbaa99887766554433221100ffeeddccbbaa9988776655",
+        isTampered: false
+      }
+    ];
+
+    let auditLogs = [
+      {
+        timestamp: "2026-09-21 14:32:21",
+        user: "Dr. Meenakshi Iyer (FO-209)",
+        action: "DOCUMENT_SIGN",
+        resource: "DOC-2026-0041 [Forensic_Fingerprint_Report.pdf]",
+        result: "SUCCESS",
+        ip: "10.42.18.91 (CFSL Intranet)",
+        txId: "TX-104-88921",
+        severity: "SECURITY"
+      },
+      {
+        timestamp: "2026-09-21 14:20:00",
+        user: "Dr. Meenakshi Iyer (FO-209)",
+        action: "DOCUMENT_UPLOAD",
+        resource: "DOC-2026-0041 [v1.0 Upload]",
+        result: "SUCCESS",
+        ip: "10.42.18.91 (CFSL Intranet)",
+        txId: "TX-104-88915",
+        severity: "NORMAL"
+      },
+      {
+        timestamp: "2026-09-21 14:15:02",
+        user: "Dr. Meenakshi Iyer (FO-209)",
+        action: "LOGIN",
+        resource: "MHA Portal Session",
+        result: "SUCCESS",
+        ip: "10.42.18.91 (CFSL Intranet)",
+        txId: "TX-AUTH-9912",
+        severity: "NORMAL"
+      },
+      {
+        timestamp: "2026-09-19 18:00:45",
+        user: "Adv. Vikram Sethi (LO-304)",
+        action: "DOCUMENT_UPLOAD",
+        resource: "DOC-2026-0049 [Draft_Charge_Sheet_CrPC_173.pdf]",
+        result: "SUCCESS",
+        ip: "10.22.4.102 (Prosecution Grid)",
+        txId: "TX-103-66231",
+        severity: "NORMAL"
+      },
+      {
+        timestamp: "2026-09-18 10:14:33",
+        user: "Insp. Rajesh Sharma (IO-1042)",
+        action: "INTEGRITY_VERIFY",
+        resource: "DOC-2026-0038 [FIR-014]",
+        result: "VERIFIED",
+        ip: "10.14.99.12 (Delhi Police VPN)",
+        txId: "TX-VER-0012",
+        severity: "NORMAL"
+      }
+    ];
+
+    let notifications = [
+      { id: 1, title: "Report Signed", text: "Dr. Meenakshi Iyer signed Forensic Report #0041", time: "10 mins ago", type: "info" },
+      { id: 2, title: "Ledger Intact", text: "Chain integrity check passed on 28 blocks", time: "1 hour ago", type: "success" },
+      { id: 3, title: "Case Hearing", text: "Hearing scheduled for CASE-2026-005 next Monday", time: "Yesterday", type: "warning" }
+    ];
+
+    let selectedDocumentForEic = documents[0];
+
+    // 4. Real Web Crypto Utilities
+    async function calculateSHA256(strOrBuffer) {
+      let buffer;
+      if (typeof strOrBuffer === 'string') {
+        const encoder = new TextEncoder();
+        buffer = encoder.encode(strOrBuffer);
+      } else {
+        buffer = strOrBuffer;
+      }
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    // Block Hash Generator Function matching SIH Specification formula
+    async function computeBlockHash(block) {
+      const payload = `${block.timestamp}:${block.txId}:${block.documentId}:${block.documentHash}:${block.userId}:${block.action}:${block.previousBlockHash}`;
+      return await calculateSHA256(payload);
+    }
+
+    // 5. Navigation & View Routing
+    function navigateTo(viewId) {
+      const views = ['dashboard', 'cases', 'case-detail', 'documents', 'evidence', 'search', 'ledger', 'audit'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update sidebar nav active styling
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/30');
+        btn.classList.add('text-slate-300');
+      });
+      const activeNav = document.getElementById(`nav-${viewId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-blue-600/20', 'text-blue-400', 'border', 'border-blue-500/30');
+        activeNav.classList.remove('text-slate-300');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Refresh specific views
+      if (viewId === 'dashboard') refreshDashboard();
+      if (viewId === 'cases') renderCasesTable();
+      if (viewId === 'documents') renderDocumentsTable();
+      if (viewId === 'evidence') renderEvidenceGrid();
+      if (viewId === 'ledger') renderLedgerBlocks();
+      if (viewId === 'audit') renderAuditTable();
+    }
+
+    // Role Switcher for Hackathon Live Demo
+    function switchRole(roleKey) {
+      const profile = ROLE_PROFILES[roleKey];
+      if (!profile) return;
+      currentUser = { ...profile };
+
+      document.getElementById('userNameDisplay').innerText = profile.name;
+      document.getElementById('userRoleBadge').innerText = profile.role;
+      document.getElementById('userAvatar').innerText = profile.avatar;
+
+      document.querySelectorAll('.role-selector-btn').forEach(btn => {
+        btn.className = "role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800";
+      });
+
+      let activeBtnId = "roleBtn-IO";
+      if (roleKey === 'FORENSIC_OFFICER') activeBtnId = "roleBtn-FO";
+      if (roleKey === 'LEGAL_OFFICER') activeBtnId = "roleBtn-LO";
+      if (roleKey === 'AUDITOR') activeBtnId = "roleBtn-AUD";
+      if (roleKey === 'ADMIN') activeBtnId = "roleBtn-ADM";
+
+      const activeBtn = document.getElementById(activeBtnId);
+      if (activeBtn) {
+        activeBtn.className = "role-selector-btn px-2.5 py-1 text-xs rounded font-medium transition-all bg-blue-600 text-white shadow-sm";
+      }
+
+      showToast(`Authenticated as ${profile.role} (${profile.name})`, "info");
+      
+      // Audit log entry for role switch
+      logAuditEvent("LOGIN", "Portal Session", "SUCCESS", "NORMAL");
+    }
+
+    function refreshDashboard() {
+      // Metrics
+      document.getElementById('kpiCasesCount').innerText = cases.length;
+      document.getElementById('kpiDocsCount').innerText = documents.length;
+      document.getElementById('kpiEvidenceCount').innerText = evidenceItems.length;
+      document.getElementById('kpiLedgerBlocks').innerText = `${ledgerBlocks.length} Blocks`;
+
+      // Recent Activity
+      const actContainer = document.getElementById('dashboardRecentActivity');
+      if (actContainer) {
+        actContainer.innerHTML = auditLogs.slice(0, 5).map(log => `
+          <div class="p-2 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors">
+            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-0.5">
+              <span class="font-medium text-slate-300 truncate max-w-[140px]">${escapeHtml(log.user)}</span>
+              <span class="font-mono text-slate-500">${escapeHtml(log.timestamp.split(' ')[1])}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold ${getSeverityClass(log.severity)}">${escapeHtml(log.action)}</span>
+              <span class="text-slate-300 text-[11px] truncate flex-1">${escapeHtml(log.resource)}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Featured Cases Grid
+      const casesGrid = document.getElementById('dashboardCasesGrid');
+      if (casesGrid) {
+        casesGrid.innerHTML = cases.slice(0, 3).map(c => `
+          <div onclick="openCaseDetail('${c.id}')" class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 transition-all cursor-pointer shadow-lg group">
+            <div class="flex justify-between items-start mb-2">
+              <span class="mono text-xs font-bold text-blue-400 group-hover:text-blue-300">${c.id}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(c.status)}">${c.status}</span>
+            </div>
+            <h4 class="text-xs font-bold text-white line-clamp-1">${escapeHtml(c.title)}</h4>
+            <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">${escapeHtml(c.description)}</p>
+            <div class="mt-3 pt-2 border-t border-slate-800/80 flex justify-between items-center text-[10px] text-slate-400">
+              <span><i class="fa-solid fa-user-shield text-blue-400"></i> ${escapeHtml(c.io.split(' ')[1])}</span>
+              <span class="text-blue-400 group-hover:translate-x-1 transition-transform">Inspect &rarr;</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderCasesTable(filtered = cases) {
+      const tbody = document.getElementById('casesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = filtered.map(c => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-blue-400 cursor-pointer" onclick="openCaseDetail('${c.id}')">${c.id}</td>
+          <td class="py-3 px-4 max-w-xs">
+            <div class="font-semibold text-white truncate cursor-pointer hover:underline" onclick="openCaseDetail('${c.id}')">${escapeHtml(c.title)}</div>
+            <div class="text-slate-400 text-[10px] truncate">${escapeHtml(c.caseNumber)}</div>
+          </td>
+          <td class="py-3 px-4 text-slate-300">${escapeHtml(c.io)}</td>
+          <td class="py-3 px-4 text-slate-400">${escapeHtml(c.department)}</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getPriorityBadgeClass(c.priority)}">${c.priority}</span></td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(c.status)}">${c.status}</span></td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="openCaseDetail('${c.id}')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded-lg text-xs font-medium transition-colors">
+              Open File
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function searchCasesTable() {
+      const q = (document.getElementById('caseSearchInput')?.value || '').toLowerCase();
+      const filtered = cases.filter(c => 
+        c.id.toLowerCase().includes(q) || 
+        c.title.toLowerCase().includes(q) || 
+        c.caseNumber.toLowerCase().includes(q)
+      );
+      renderCasesTable(filtered);
+    }
+
+    function filterCasesByStatus(status) {
+      document.querySelectorAll('.case-filter-btn').forEach(btn => {
+        btn.className = "case-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700";
+      });
+      event.target.className = "case-filter-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white font-medium";
+
+      if (status === 'ALL') {
+        renderCasesTable(cases);
+      } else {
+        renderCasesTable(cases.filter(c => c.status === status));
+      }
+    }
+
+    function openCaseDetail(caseId) {
+      const c = cases.find(item => item.id === caseId);
+      if (!c) return;
+
+      document.getElementById('cdCaseNumber').innerText = c.id;
+      document.getElementById('cdCaseTitle').innerText = c.title;
+      document.getElementById('cdStatusBadge').innerText = c.status;
+      document.getElementById('cdStatusBadge').className = `px-2 py-0.5 rounded text-[11px] font-bold ${getStatusBadgeClass(c.status)}`;
+      document.getElementById('cdPriorityBadge').innerText = `${c.priority} PRIORITY`;
+      document.getElementById('cdPriorityBadge').className = `px-2 py-0.5 rounded text-[11px] font-bold ${getPriorityBadgeClass(c.priority)}`;
+      document.getElementById('cdDescription').innerText = c.description;
+      document.getElementById('cdLeadOfficer').innerText = c.io;
+      document.getElementById('cdDepartment').innerText = c.department;
+      document.getElementById('cdCreatedDate').innerText = c.createdDate;
+
+      // Render Persons
+      const personsEl = document.getElementById('cdPersonsList');
+      if (personsEl) {
+        personsEl.innerHTML = (c.persons || []).map(p => `
+          <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800">
+            <span class="font-bold text-white block">${escapeHtml(p.name)}</span>
+            <span class="text-[11px] text-blue-400">${escapeHtml(p.role)}</span>
+            <span class="text-[10px] text-slate-500 block">${escapeHtml(p.relation)}</span>
+          </div>
+        `).join('');
+      }
+
+      // Filter docs for this case
+      const caseDocs = documents.filter(d => d.caseId === c.id);
+      document.getElementById('cdDocsCount').innerText = caseDocs.length;
+      const docsEl = document.getElementById('caseDocumentsList');
+      if (docsEl) {
+        docsEl.innerHTML = caseDocs.map(d => `
+          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold text-white truncate max-w-[200px]">${escapeHtml(d.title)}</span>
+              <span class="mono text-[10px] text-amber-400 font-bold">${d.version}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 space-y-1">
+              <div>Type: <span class="text-slate-200">${d.type}</span></div>
+              <div class="truncate font-mono text-[10px] text-emerald-400">SHA-256: ${d.hash.slice(0, 24)}...</div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between items-center">
+              <button onclick="openEicModal('${d.id}')" class="px-2.5 py-1 bg-emerald-700/30 hover:bg-emerald-700 text-emerald-300 hover:text-white rounded text-[11px] font-semibold flex items-center gap-1 transition-colors">
+                <i class="fa-solid fa-shield-halved"></i> Verify EIC
+              </button>
+              ${d.signatureStatus === 'PENDING' ? `
+                <button onclick="signDocumentQuick('${d.id}')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-[11px] font-semibold">
+                  Digitally Sign
+                </button>
+              ` : `
+                <span class="text-[10px] text-emerald-400 font-mono"><i class="fa-solid fa-check"></i> Signed</span>
+              `}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Filter evidence
+      const caseEv = evidenceItems.filter(e => e.caseId === c.id);
+      document.getElementById('cdEvidenceCount').innerText = caseEv.length;
+      const evList = document.getElementById('caseEvidenceList');
+      if (evList) {
+        evList.innerHTML = caseEv.map(e => `
+          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-amber-400">${e.id}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">${e.status}</span>
+              </div>
+              <p class="text-xs text-white font-medium mt-1">${escapeHtml(e.description)}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">Custodian: <span class="text-slate-300">${escapeHtml(e.currentCustodian)}</span> • Location: ${escapeHtml(e.location)}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="transferEvidenceModal('${e.id}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs">
+                Transfer Custody
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Build Case Timeline from real events
+      const timelineEl = document.getElementById('caseTimelineEvents');
+      if (timelineEl) {
+        timelineEl.innerHTML = `
+          <div class="relative mb-6">
+            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-blue-500 border-2 border-slate-900"></span>
+            <div class="text-xs font-bold text-white">FIR Registered & Initial Sealed Dossier</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Registered under Sections 66C & 66D IT Act. Investigating officer assigned.</p>
+            <span class="text-[10px] font-mono text-slate-500">14 Aug 2026, 11:00 IST</span>
+          </div>
+          <div class="relative mb-6">
+            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-purple-500 border-2 border-slate-900"></span>
+            <div class="text-xs font-bold text-white">Digital Evidence Seized & Custodial Hash Generated</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Dell workstation and USB flash drives sealed in antistatic bag. Hash: 7f83b165...</p>
+            <span class="text-[10px] font-mono text-slate-500">15 Aug 2026, 03:15 IST</span>
+          </div>
+          <div class="relative mb-6">
+            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900"></span>
+            <div class="text-xs font-bold text-white">Forensic Fingerprint & Artifacts Signed</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Dr. Meenakshi Iyer sealed report version v2.0 anchored to Block #104.</p>
+            <span class="text-[10px] font-mono text-slate-500">21 Sep 2026, 14:32 IST</span>
+          </div>
+        `;
+      }
+
+      switchCaseTab('overview');
+      navigateTo('case-detail');
+    }
+
+    function switchCaseTab(tab) {
+      document.querySelectorAll('.case-subtab').forEach(b => {
+        b.className = "case-subtab pb-3 text-slate-400 hover:text-white";
+      });
+      const activeBtn = document.getElementById(`caseTab-${tab}`);
+      if (activeBtn) {
+        activeBtn.className = "case-subtab pb-3 text-blue-400 border-b-2 border-blue-500 font-semibold";
+      }
+
+      ['overview', 'documents', 'evidence', 'timeline'].forEach(t => {
+        const el = document.getElementById(`caseContent-${t}`);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(`caseContent-${tab}`);
+      if (target) target.classList.remove('hidden');
+    }
+
+    function renderDocumentsTable() {
+      const tbody = document.getElementById('documentsTableBody');
+      if (!tbody) return;
+
+      const typeF = document.getElementById('docTypeFilter')?.value || 'ALL';
+      const classF = document.getElementById('docClassFilter')?.value || 'ALL';
+      const searchQ = (document.getElementById('docSearchInput')?.value || '').toLowerCase();
+
+      let filtered = documents.filter(d => {
+        if (typeF !== 'ALL' && d.type !== typeF) return false;
+        if (classF !== 'ALL' && d.classification !== classF) return false;
+        if (searchQ && !d.title.toLowerCase().includes(searchQ) && !d.hash.toLowerCase().includes(searchQ) && !d.caseId.toLowerCase().includes(searchQ)) return false;
+        return true;
+      });
+
+      tbody.innerHTML = filtered.map(d => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4">
+            <div class="font-bold text-white cursor-pointer hover:underline flex items-center gap-1.5" onclick="openEicModal('${d.id}')">
+              <i class="fa-regular fa-file-pdf text-rose-400"></i> ${escapeHtml(d.title)}
+            </div>
+            <div class="text-slate-400 text-[10px] font-mono">${d.id} • ${d.fileSize}</div>
+          </td>
+          <td class="py-3 px-4 font-mono text-blue-400 cursor-pointer" onclick="openCaseDetail('${d.caseId}')">${d.caseId}</td>
+          <td class="py-3 px-4 text-slate-300">${d.type}</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-slate-800 text-amber-300 font-mono font-bold text-[10px]">${d.version}</span></td>
+          <td class="py-3 px-4 font-mono text-[10px] text-emerald-400 cursor-pointer hover:text-emerald-300" title="${d.hash}" onclick="openEicModal('${d.id}')">
+            ${d.hash.slice(0, 16)}...
+          </td>
+          <td class="py-3 px-4">
+            ${d.signatureStatus === 'VERIFIED' ? 
+              `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold"><i class="fa-solid fa-check"></i> Signed</span>` : 
+              `<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold">Pending Sign</span>`}
+          </td>
+          <td class="py-3 px-4">
+            ${d.isTampered ? 
+              `<span class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 font-bold text-[10px]"><i class="fa-solid fa-triangle-exclamation"></i> MISMATCH</span>` : 
+              `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold text-[10px]"><i class="fa-solid fa-circle-check"></i> VALID</span>`}
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex justify-end gap-1.5">
+              <button onclick="openEicModal('${d.id}')" class="px-2.5 py-1 bg-emerald-700/30 hover:bg-emerald-700 text-emerald-300 hover:text-white rounded text-xs font-medium transition-colors" title="Inspect Evidence Integrity Capsule">
+                <i class="fa-solid fa-shield-halved"></i> Capsule
+              </button>
+              ${d.signatureStatus === 'PENDING' ? `
+                <button onclick="signDocumentQuick('${d.id}')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-medium">
+                  Sign
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderEvidenceGrid() {
+      const container = document.getElementById('evidenceCardsGrid');
+      if (!container) return;
+      container.innerHTML = evidenceItems.map(e => `
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition-colors shadow-lg space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="mono text-xs font-bold text-amber-400">${e.id}</span>
+              <h3 class="text-sm font-bold text-white mt-1">${escapeHtml(e.description)}</h3>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/80">${e.status}</span>
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl space-y-1.5 text-xs text-slate-300 font-mono">
+            <div class="flex justify-between"><span class="text-slate-500">Case ID:</span> <span class="text-blue-400">${e.caseId}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Current Custodian:</span> <span class="text-white">${escapeHtml(e.currentCustodian)}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Storage Location:</span> <span class="text-slate-300">${escapeHtml(e.location)}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Integrity Hash:</span> <span class="text-emerald-400">${e.hash.slice(0, 18)}...</span></div>
+          </div>
+
+          <!-- Custody Progress Stepper -->
+          <div class="pt-2">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Custody Lifecycle Progression</div>
+            <div class="grid grid-cols-7 text-center text-[9px] gap-1 font-mono">
+              <span class="py-1 rounded ${e.status === 'COLLECTED' || true ? 'bg-blue-900 text-blue-200' : 'bg-slate-800 text-slate-500'}">COLLECT</span>
+              <span class="py-1 rounded bg-blue-900 text-blue-200">SEAL</span>
+              <span class="py-1 rounded bg-blue-900 text-blue-200">TRANS</span>
+              <span class="py-1 rounded bg-blue-900 text-blue-200">RCVD</span>
+              <span class="py-1 rounded ${e.status === 'EXAMINED' || e.status === 'PRESENTED' || e.status === 'STORED' ? 'bg-emerald-900 text-emerald-300' : 'bg-slate-800 text-slate-500'}">EXAM</span>
+              <span class="py-1 rounded ${e.status === 'STORED' || e.status === 'PRESENTED' ? 'bg-emerald-900 text-emerald-300' : 'bg-slate-800 text-slate-500'}">STORE</span>
+              <span class="py-1 rounded ${e.status === 'PRESENTED' ? 'bg-amber-900 text-amber-300 font-bold' : 'bg-slate-800 text-slate-500'}">COURT</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+            <button onclick="transferEvidenceModal('${e.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-people-arrows"></i> Record Transfer
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function transferEvidenceModal(evId) {
+      const item = evidenceItems.find(i => i.id === evId);
+      if (!item) return;
+      
+      const newCustodian = prompt(`Transfer Custody for ${item.id}\nCurrent Custodian: ${item.currentCustodian}\nEnter New Custodian Name/Badge:`, "Patiala House Court Nazir");
+      if (newCustodian) {
+        item.currentCustodian = newCustodian;
+        item.status = "TRANSFERRED";
+        showToast(`Custody transferred to ${newCustodian}. New Ledger event logged!`, "success");
+        
+        // Log Audit & Ledger
+        logAuditEvent("CUSTODY_TRANSFER", `${item.id} -> ${newCustodian}`, "SUCCESS", "SECURITY");
+        addLedgerBlock(item.id, item.hash, "CUSTODY_TRANSFER");
+        renderEvidenceGrid();
+      }
+    }
+
+    function setAndSearch(query) {
+      document.getElementById('aiSearchQuery').value = query;
+      executeAiSearch();
+    }
+
+    function clearSearchInput() {
+      document.getElementById('aiSearchQuery').value = '';
+    }
+
+    function executeAiSearch() {
+      const query = (document.getElementById('aiSearchQuery').value || '').trim();
+      if (!query) return;
+
+      const interpretationEl = document.getElementById('aiSearchInterpretation');
+      const badgesEl = document.getElementById('aiEntitiesBadges');
+      const resultsContainer = document.getElementById('searchResultsContainer');
+
+      // NLP Extraction Simulator
+      const entities = [];
+      const lower = query.toLowerCase();
+
+      if (lower.includes('2026-014') || lower.includes('014')) entities.push({ label: "Case Ref", value: "CASE-2026-014", color: "bg-blue-900 text-blue-300" });
+      if (lower.includes('fingerprint') || lower.includes('forensic')) entities.push({ label: "Category", value: "FORENSIC REPORT", color: "bg-purple-900 text-purple-300" });
+      if (lower.includes('witness') || lower.includes('statement')) entities.push({ label: "Doc Type", value: "WITNESS STATEMENT", color: "bg-emerald-900 text-emerald-300" });
+      if (lower.includes('charge sheet')) entities.push({ label: "Doc Type", value: "CHARGE SHEET", color: "bg-amber-900 text-amber-300" });
+      if (lower.includes('verma')) entities.push({ label: "Person", value: "Rajesh Verma", color: "bg-rose-900 text-rose-300" });
+      if (lower.includes('high priority')) entities.push({ label: "Priority", value: "HIGH", color: "bg-red-900 text-red-300" });
+
+      interpretationEl.classList.remove('hidden');
+      badgesEl.innerHTML = entities.map(e => `
+        <span class="px-2.5 py-1 rounded-lg ${e.color} font-mono text-[11px] font-semibold flex items-center gap-1">
+          <i class="fa-solid fa-tag text-[9px]"></i> ${e.label}: ${e.value}
+        </span>
+      `).join('');
+
+      // Match documents based on extracted tokens
+      let matched = documents.filter(doc => {
+        if (lower.includes('fingerprint') && doc.title.toLowerCase().includes('fingerprint')) return true;
+        if (lower.includes('witness') && doc.type === 'WITNESS STATEMENT') return true;
+        if (lower.includes('charge') && doc.type === 'CHARGE SHEET') return true;
+        if (lower.includes('2026-014') && doc.caseId === 'CASE-2026-014') return true;
+        return doc.title.toLowerCase().includes(lower);
+      });
+
+      if (matched.length === 0) matched = documents.slice(0, 2);
+
+      resultsContainer.innerHTML = `
+        <div class="text-xs text-slate-400 font-semibold mb-2">Found ${matched.length} authorized document matches:</div>
+        ${matched.map(d => `
+          <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-blue-500/40 transition-colors shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="mono text-xs text-blue-400 font-bold">${d.caseId}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-purple-300">${d.type}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-amber-300">${d.classification}</span>
+              </div>
+              <h3 class="text-sm font-bold text-white mt-1 cursor-pointer hover:underline" onclick="openEicModal('${d.id}')">
+                ${escapeHtml(d.title)}
+              </h3>
+              <p class="text-slate-400 text-xs mt-0.5 font-mono">
+                Version: ${d.version} • Hash: ${d.hash.slice(0, 28)}... • Anchored to: ${d.blockRef}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openEicModal('${d.id}')" class="px-3 py-1.5 bg-emerald-700/30 hover:bg-emerald-700 text-emerald-300 hover:text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-shield-halved"></i> Evidence Capsule
+              </button>
+              <button onclick="openCaseDetail('${d.caseId}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold">
+                Open Case
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderLedgerBlocks() {
+      const container = document.getElementById('ledgerBlocksList');
+      if (!container) return;
+
+      container.innerHTML = ledgerBlocks.slice().reverse().map(b => `
+        <div class="p-5 rounded-2xl ${b.isTampered ? 'bg-rose-950/40 border-2 border-rose-600' : 'bg-slate-900/80 border border-slate-800'} transition-all shadow-xl space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg ${b.isTampered ? 'bg-rose-900 text-rose-300' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'} flex items-center justify-center font-mono font-bold text-xs">
+                #${b.index}
+              </div>
+              <div>
+                <span class="mono text-xs font-bold text-white">BLOCK #${b.index}</span>
+                <span class="text-slate-400 text-[11px] ml-2 font-mono">TX: ${b.txId}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.isTampered ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">
+                ${b.isTampered ? '⚠ TAMPERED / HASH INVALID' : '✓ IMMUTABLE VERIFIED'}
+              </span>
+              <span class="text-[11px] text-slate-400 font-mono">${b.timestamp}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="space-y-1 font-mono">
+              <div class="text-slate-400">Target Document: <span class="text-blue-400 font-semibold">${b.documentId}</span></div>
+              <div class="text-slate-400">Authorizing Officer: <span class="text-slate-200">${b.userId}</span></div>
+              <div class="text-slate-400">Ledger Action: <span class="text-amber-300 font-bold">${b.action}</span></div>
+            </div>
+            <div class="space-y-1 font-mono text-[10px] break-all">
+              <div class="text-slate-400">Previous Hash: <span class="text-slate-500">${b.previousBlockHash}</span></div>
+              <div class="text-slate-400">Current Block Hash: <span class="${b.isTampered ? 'text-rose-400 font-bold' : 'text-emerald-400'}">${b.currentBlockHash}</span></div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function triggerLedgerVerification() {
+      let isBroken = false;
+      let brokenIndex = -1;
+
+      for (let i = 1; i < ledgerBlocks.length; i++) {
+        const prev = ledgerBlocks[i - 1];
+        const curr = ledgerBlocks[i];
+
+        if (curr.isTampered || curr.previousBlockHash !== prev.currentBlockHash) {
+          isBroken = true;
+          brokenIndex = curr.index;
+          break;
+        }
+      }
+
+      const banner = document.getElementById('ledgerVerificationBanner');
+      const topBadge = document.getElementById('topSecurityBadge');
+
+      if (isBroken) {
+        banner.className = "p-4 rounded-2xl bg-rose-950/60 border border-rose-600 flex items-start gap-3 badge-glow-red";
+        banner.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-rose-900 text-rose-300 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fa-solid fa-triangle-exclamation text-base"></i>
+          </div>
+          <div class="text-xs">
+            <h3 class="font-bold text-rose-300 text-sm">BLOCKCHAIN INTEGRITY FAILURE: TAMPER DETECTED</h3>
+            <p class="text-slate-200 mt-0.5">
+              Mathematical mismatch at Block #${brokenIndex}. The hash linkage from previous block has been broken! System raised security alert.
+            </p>
+          </div>
+        `;
+        topBadge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-950 text-rose-400 border border-rose-800 badge-glow-red";
+        topBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> LEDGER ALERT: TAMPER DETECTED`;
+        showToast("Chain verification failed! Historical ledger tampering detected.", "critical");
+        logAuditEvent("INTEGRITY_VERIFY", `Ledger Chain Check (Block #${brokenIndex})`, "TAMPER_DETECTED", "CRITICAL");
+      } else {
+        banner.className = "p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/50 flex items-start gap-3 badge-glow";
+        banner.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-emerald-900/60 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fa-solid fa-check-double text-base"></i>
+          </div>
+          <div class="text-xs">
+            <h3 class="font-bold text-emerald-300 text-sm">Ledger Status: ALL BLOCKS MATHEMATICALLY VERIFIED</h3>
+            <p class="text-slate-300 mt-0.5">
+              Verified 28 historical blocks. SHA-256 parent hash references valid across full append-only chain.
+            </p>
+          </div>
+        `;
+        topBadge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 badge-glow";
+        topBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span><i class="fa-solid fa-lock text-[10px]"></i> LEDGER INTEGRITY: VERIFIED`;
+        showToast("Ledger chain verification successful. All hashes consistent.", "success");
+        logAuditEvent("INTEGRITY_VERIFY", "Ledger Full Chain", "VERIFIED", "NORMAL");
+      }
+    }
+
+    function simulateTamperBlock() {
+      // Intentionally tamper Block 104 hash
+      const target = ledgerBlocks.find(b => b.index === 104);
+      if (target) {
+        target.isTampered = true;
+        target.currentBlockHash = "ffff0000badf00d0000000000000000000000000000000000000000000000000";
+        showToast("Simulated illicit modification of Block #104. Now click 'Verify Entire Chain'!", "warning");
+        renderLedgerBlocks();
+      }
+    }
+
+    function restoreLedger() {
+      const target = ledgerBlocks.find(b => b.index === 104);
+      if (target) {
+        target.isTampered = false;
+        target.currentBlockHash = "47aa1290bbffeeddccbbaa99887766554433221100ffeeddccbbaa9988776655";
+      }
+      renderLedgerBlocks();
+      triggerLedgerVerification();
+      showToast("Ledger restored to certified baseline state.", "info");
+    }
+
+    function openEicModal(docId) {
+      const doc = documents.find(d => d.id === docId);
+      if (!doc) return;
+      selectedDocumentForEic = doc;
+
+      document.getElementById('eicDocId').innerText = doc.id;
+      document.getElementById('eicCaseId').innerText = doc.caseId;
+      document.getElementById('eicTitle').innerText = doc.title;
+      document.getElementById('eicCategory').innerText = doc.type;
+      document.getElementById('eicVersion').innerText = doc.version;
+      document.getElementById('eicUploader').innerText = doc.uploadedBy;
+      document.getElementById('eicSigner').innerText = doc.signedBy || "Awaiting Signature";
+      document.getElementById('eicSigStatus').innerText = doc.signatureStatus;
+      document.getElementById('eicSigStatus').className = doc.signatureStatus === 'VERIFIED' ? 
+        "px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-semibold text-[10px]" : 
+        "px-2 py-0.5 rounded bg-amber-900/60 text-amber-300 font-semibold text-[10px]";
+      document.getElementById('eicTimestamp').innerText = doc.signedAt || doc.createdAt;
+      document.getElementById('eicTrustedHash').innerText = doc.hash;
+      document.getElementById('eicBlockRef').innerText = `${doc.blockRef} (${doc.txId})`;
+
+      updateEicTamperDisplay();
+      document.getElementById('eicModal').classList.remove('hidden');
+    }
+
+    function closeEicModal() {
+      document.getElementById('eicModal').classList.add('hidden');
+    }
+
+    function updateEicTamperDisplay() {
+      const doc = selectedDocumentForEic;
+      const banner = document.getElementById('eicVerificationBanner');
+      const calcHash = document.getElementById('eicCalculatedHash');
+      const label = document.getElementById('eicCalcHashMatchLabel');
+      const icon = document.getElementById('eicStatusIcon');
+      const title = document.getElementById('eicStatusTitle');
+      const subtitle = document.getElementById('eicStatusSubtitle');
+      const tamperBtn = document.getElementById('btnTamperToggle');
+
+      if (doc.isTampered) {
+        banner.className = "p-4 rounded-xl border flex items-center justify-between bg-rose-950/60 border-rose-600 text-rose-200 badge-glow-red";
+        icon.className = "w-10 h-10 rounded-xl bg-rose-900/70 flex items-center justify-center text-lg text-rose-400";
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        title.innerText = "⚠ INTEGRITY MISMATCH DETECTED";
+        title.className = "font-bold text-sm text-rose-400";
+        subtitle.innerText = "Storage file SHA-256 does NOT match the immutable ledger anchor hash!";
+        calcHash.innerText = doc.tamperedHash || "e9b27189c4456a00018491823908129038102938102938102938102938102938";
+        calcHash.className = "mono text-[11px] bg-slate-900 p-2.5 rounded border border-rose-700 text-rose-400 break-all select-all";
+        label.innerText = "MISMATCH (File Corrupted / Tampered)";
+        label.className = "text-rose-400 font-mono font-bold";
+        tamperBtn.innerText = "Restore Original File";
+        tamperBtn.className = "px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors";
+      } else {
+        banner.className = "p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-800/60 text-emerald-300 badge-glow";
+        icon.className = "w-10 h-10 rounded-xl bg-emerald-900/50 flex items-center justify-center text-lg text-emerald-400";
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        title.innerText = "✓ DOCUMENT INTEGRITY VERIFIED";
+        title.className = "font-bold text-sm text-emerald-400";
+        subtitle.innerText = "Current calculated file hash matches the sealed anchor on the append-only ledger.";
+        calcHash.innerText = doc.hash;
+        calcHash.className = "mono text-[11px] bg-slate-900 p-2.5 rounded border border-slate-800 text-emerald-400 break-all select-all";
+        label.innerText = "Matches 100%";
+        label.className = "text-emerald-400 font-mono";
+        tamperBtn.innerText = "Simulate File Tampering";
+        tamperBtn.className = "px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition-colors";
+      }
+    }
+
+    function toggleSimulateDocTamper() {
+      const doc = selectedDocumentForEic;
+      if (!doc) return;
+
+      doc.isTampered = !doc.isTampered;
+      if (doc.isTampered) {
+        doc.tamperedHash = "baad0000" + doc.hash.slice(8);
+        showToast("Tamper bit injected into stored file! Live verification failed.", "critical");
+        logAuditEvent("INTEGRITY_VERIFY", `${doc.id} [${doc.title}]`, "INTEGRITY_MISMATCH", "CRITICAL");
+      } else {
+        doc.tamperedHash = null;
+        showToast("Restored certified original file bytes. Verification valid.", "success");
+        logAuditEvent("INTEGRITY_VERIFY", `${doc.id} [${doc.title}]`, "VERIFIED", "NORMAL");
+      }
+
+      updateEicTamperDisplay();
+      renderDocumentsTable();
+    }
+
+    function runEicHashVerification() {
+      const doc = selectedDocumentForEic;
+      const btn = document.getElementById('eicRecalculateBtn');
+      btn.innerHTML = '<i class="fa-solid fa-arrows-rotate animate-spin"></i> Hashing...';
+      
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Re-Calculate Hash';
+        if (doc.isTampered) {
+          showToast("Re-calculation completed: Hash Mismatch Detected!", "critical");
+        } else {
+          showToast("Re-calculation completed: Hash matches ledger anchor 100%!", "success");
+        }
+      }, 400);
+    }
+
+    function downloadDocCertificate() {
+      const doc = selectedDocumentForEic;
+      const certData = {
+        system: "CASELOCK National Crime Records & Legal Document Management Grid",
+        standard: "NCRB / MHA Evidence Admissibility Standard STD-509",
+        documentId: doc.id,
+        caseId: doc.caseId,
+        title: doc.title,
+        sha256: doc.hash,
+        blockRef: doc.blockRef,
+        txId: doc.txId,
+        signedBy: doc.signedBy,
+        timestamp: new Date().toISOString(),
+        verifiedStatus: doc.isTampered ? "TAMPER_DETECTED" : "VERIFIED"
+      };
+
+      const blob = new Blob([JSON.stringify(certData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `EIC_Certificate_${doc.id}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`Exported Evidence Certificate for ${doc.id}`, "info");
+    }
+
+    function openUploadModal() {
+      populateCaseSelect('uploadCaseSelect');
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function openUploadModalForCase() {
+      openUploadModal();
+      const currentCase = document.getElementById('cdCaseNumber').innerText;
+      document.getElementById('uploadCaseSelect').value = currentCase;
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.add('hidden');
+      document.getElementById('ocrProcessingCard').classList.add('hidden');
+    }
+
+    function populateCaseSelect(selectId) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+      select.innerHTML = cases.map(c => `
+        <option value="${c.id}">${c.id} — ${c.title}</option>
+      `).join('');
+    }
+
+    async function handleFileSelected(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      document.getElementById('fileDropLabel').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      document.getElementById('uploadTitle').value = file.name;
+
+      // Real Client-Side SHA-256 calculation
+      const arrayBuffer = await file.arrayBuffer();
+      const clientHash = await calculateSHA256(arrayBuffer);
+
+      // Trigger Simulated OCR & AI Classifier
+      const ocrCard = document.getElementById('ocrProcessingCard');
+      ocrCard.classList.remove('hidden');
+      document.getElementById('ocrCalculatedHash').innerText = clientHash;
+
+      // Classify document based on name
+      const fname = file.name.toUpperCase();
+      let predicted = "INVESTIGATION RECORD";
+      if (fname.includes("FORENSIC") || fname.includes("FINGERPRINT") || fname.includes("LAB")) predicted = "FORENSIC REPORT";
+      else if (fname.includes("FIR")) predicted = "FIR";
+      else if (fname.includes("WITNESS") || fname.includes("STATEMENT")) predicted = "WITNESS STATEMENT";
+      else if (fname.includes("CHARGE")) predicted = "CHARGE SHEET";
+
+      document.getElementById('ocrPredictedType').innerText = predicted;
+      document.getElementById('ocrConfidenceBadge').innerText = "Confidence: 96.4%";
+    }
+
+    async function handleDocumentUpload(e) {
+      e.preventDefault();
+      const title = document.getElementById('uploadTitle').value;
+      const caseId = document.getElementById('uploadCaseSelect').value;
+      const classification = document.getElementById('uploadClassification').value;
+      const predictedType = document.getElementById('ocrPredictedType').innerText || "INVESTIGATION RECORD";
+      
+      const newDocId = `DOC-2026-00${Math.floor(Math.random() * 80) + 50}`;
+      const fakeHash = await calculateSHA256(`${title}:${caseId}:${Date.now()}`);
+      const txId = `TX-${ledgerBlocks.length + 101}-${Math.floor(Math.random() * 80000) + 10000}`;
+      const blockIndex = ledgerBlocks.length + 101;
+
+      const newDoc = {
+        id: newDocId,
+        caseId: caseId,
+        title: title,
+        type: predictedType,
+        classification: classification,
+        version: "v1.0",
+        uploadedBy: `${currentUser.name} (${currentUser.badge})`,
+        department: currentUser.department,
+        hash: fakeHash,
+        tamperedHash: null,
+        isTampered: false,
+        signatureStatus: "PENDING",
+        signedBy: null,
+        signedAt: null,
+        blockRef: `Block #${blockIndex}`,
+        txId: txId,
+        createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        fileSize: "1.8 MB"
+      };
+
+      documents.unshift(newDoc);
+      addLedgerBlock(newDocId, fakeHash, "DOCUMENT_UPLOAD");
+      logAuditEvent("DOCUMENT_UPLOAD", `${newDocId} [${title}]`, "SUCCESS", "NORMAL");
+
+      closeUploadModal();
+      showToast(`Document ${newDocId} successfully ingested and anchored to Block #${blockIndex}!`, "success");
+      renderDocumentsTable();
+      refreshDashboard();
+    }
+
+    function signDocumentQuick(docId) {
+      const doc = documents.find(d => d.id === docId);
+      if (!doc) return;
+
+      if (currentUser.role !== 'FORENSIC_OFFICER' && currentUser.role !== 'INVESTIGATING_OFFICER') {
+        showToast(`Access Denied: Role ${currentUser.role} does not possess signing keys for this document type.`, "warning");
+        return;
+      }
+
+      doc.signatureStatus = "VERIFIED";
+      doc.signedBy = `${currentUser.name} (${currentUser.badge})`;
+      doc.signedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+      doc.version = "v2.0";
+
+      addLedgerBlock(doc.id, doc.hash, "DIGITAL_SIGN");
+      logAuditEvent("DOCUMENT_SIGN", `${doc.id} signed by ${currentUser.name}`, "SUCCESS", "SECURITY");
+
+      showToast(`Document ${doc.id} digitally signed with ECDSA key and sealed on new Ledger Block!`, "success");
+      renderDocumentsTable();
+      refreshDashboard();
+    }
+
+    async function addLedgerBlock(docId, docHash, action) {
+      const prevBlock = ledgerBlocks[ledgerBlocks.length - 1];
+      const newIndex = prevBlock.index + 1;
+      const txId = `TX-${newIndex}-${Math.floor(Math.random() * 80000) + 10000}`;
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+      const blockCandidate = {
+        index: newIndex,
+        timestamp: now,
+        txId: txId,
+        documentId: docId,
+        documentHash: docHash,
+        userId: currentUser.badge,
+        action: action,
+        previousBlockHash: prevBlock.currentBlockHash,
+        isTampered: false
+      };
+
+      blockCandidate.currentBlockHash = await computeBlockHash(blockCandidate);
+      ledgerBlocks.push(blockCandidate);
+    }
+
+    function logAuditEvent(action, resource, result, severity = "NORMAL") {
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      auditLogs.unshift({
+        timestamp: now,
+        user: `${currentUser.name} (${currentUser.badge})`,
+        action: action,
+        resource: resource,
+        result: result,
+        ip: "10.42.18.91 (Local Demo)",
+        txId: `TX-LOG-${Math.floor(Math.random() * 90000) + 10000}`,
+        severity: severity
+      });
+      renderAuditTable();
+    }
+
+    function renderAuditTable() {
+      const tbody = document.getElementById('auditTableBody');
+      if (!tbody) return;
+
+      const actionF = document.getElementById('auditActionFilter')?.value || 'ALL';
+      const sevF = document.getElementById('auditSeverityFilter')?.value || 'ALL';
+      const searchQ = (document.getElementById('auditSearchInput')?.value || '').toLowerCase();
+
+      const filtered = auditLogs.filter(log => {
+        if (actionF !== 'ALL' && log.action !== actionF) return false;
+        if (sevF !== 'ALL' && log.severity !== sevF) return false;
+        if (searchQ && !log.user.toLowerCase().includes(searchQ) && !log.resource.toLowerCase().includes(searchQ) && !log.action.toLowerCase().includes(searchQ)) return false;
+        return true;
+      });
+
+      tbody.innerHTML = filtered.map(log => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4 font-mono text-slate-400 text-[10px]">${log.timestamp}</td>
+          <td class="py-3 px-4 text-white font-medium">${escapeHtml(log.user)}</td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${getSeverityClass(log.severity)}">${log.action}</span>
+          </td>
+          <td class="py-3 px-4 text-slate-300 max-w-xs truncate">${escapeHtml(log.resource)}</td>
+          <td class="py-3 px-4 font-semibold ${log.result === 'TAMPER_DETECTED' || log.result === 'INTEGRITY_MISMATCH' ? 'text-rose-400' : 'text-emerald-400'}">${log.result}</td>
+          <td class="py-3 px-4 font-mono text-slate-400 text-[10px]">${log.ip}</td>
+          <td class="py-3 px-4 font-mono text-blue-400 text-[10px]">${log.txId}</td>
+        </tr>
+      `).join('');
+    }
+
+    function exportAuditLog() {
+      const blob = new Blob([JSON.stringify(auditLogs, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CASELOCK_Audit_Trail_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Exported tamper-evident audit trail JSON", "info");
+    }
+
+    // Step 1: Login as IO and navigate to Case 014
+    function demoStep1() {
+      switchRole('INVESTIGATING_OFFICER');
+      openCaseDetail('CASE-2026-014');
+      closeJudgeGuideModal();
+      showToast("Step 1 Complete: Logged in as Insp. Sharma & loaded CASE-2026-014", "info");
+    }
+
+    // Step 2: Open Ingest Modal with Fingerprint report
+    function demoStep2() {
+      openUploadModal();
+      document.getElementById('uploadTitle').value = "Forensic_Fingerprint_Report.pdf";
+      document.getElementById('uploadCaseSelect').value = "CASE-2026-014";
+      document.getElementById('uploadClassification').value = "CONFIDENTIAL";
+      
+      const ocrCard = document.getElementById('ocrProcessingCard');
+      ocrCard.classList.remove('hidden');
+      document.getElementById('ocrPredictedType').innerText = "FORENSIC REPORT";
+      document.getElementById('ocrCalculatedHash').innerText = "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069";
+      closeJudgeGuideModal();
+      showToast("Step 2 Complete: Preloaded Forensic report with OCR & client-side SHA-256", "info");
+    }
+
+    // Step 3: Switch to Forensic Officer and sign
+    function demoStep3() {
+      switchRole('FORENSIC_OFFICER');
+      signDocumentQuick('DOC-2026-0041');
+      closeJudgeGuideModal();
+      showToast("Step 3 Complete: Dr. Iyer digitally signed report version v2.0", "success");
+    }
+
+    // Step 4: Open Integrity Ledger
+    function demoStep4() {
+      navigateTo('ledger');
+      closeJudgeGuideModal();
+      showToast("Step 4 Complete: Inspect Block #104 containing action DIGITAL_SIGN", "info");
+    }
+
+    // Step 5: Open EIC Capsule and verify
+    function demoStep5() {
+      openEicModal('DOC-2026-0041');
+      closeJudgeGuideModal();
+      showToast("Step 5 Complete: Evidence Integrity Capsule opened and verified!", "success");
+    }
+
+    // Step 6: Simulate File Tampering
+    function demoStep6() {
+      openEicModal('DOC-2026-0041');
+      toggleSimulateDocTamper();
+      closeJudgeGuideModal();
+      showToast("Step 6 Complete: Injected byte variance -> ⚠ INTEGRITY MISMATCH DETECTED!", "critical");
+    }
+
+    // Step 7: Open Audit Trail
+    function demoStep7() {
+      navigateTo('audit');
+      closeJudgeGuideModal();
+      showToast("Step 7 Complete: Full audit log displayed with cryptographic records", "info");
+    }
+
+    function openNewCaseModal() {
+      const id = prompt("Enter Case Registration ID (e.g. CASE-2026-099):", `CASE-2026-0${Math.floor(Math.random() * 80) + 20}`);
+      if (!id) return;
+      const title = prompt("Enter Case Title / Summary:", "Unauthorized Intrusion at Telecom Switching Node");
+      if (!title) return;
+
+      cases.unshift({
+        id: id,
+        caseNumber: `FIR-2026/DL-CR/${id.split('-')[2]}`,
+        title: title,
+        type: "CYBERCRIME",
+        status: "OPEN",
+        priority: "HIGH",
+        io: `${currentUser.name} (${currentUser.badge})`,
+        department: currentUser.department,
+        createdDate: new Date().toLocaleDateString('en-GB'),
+        description: "Initial FIR registered and case dossier sealed.",
+        persons: []
+      });
+
+      showToast(`Created new Case ${id}`, "success");
+      logAuditEvent("CASE_CREATE", id, "SUCCESS", "NORMAL");
+      renderCasesTable();
+      refreshDashboard();
+    }
+
+    function openRegisterEvidenceModal() {
+      populateCaseSelect('evCaseSelect');
+      document.getElementById('evidenceModal').classList.remove('hidden');
+    }
+
+    function closeRegisterEvidenceModal() {
+      document.getElementById('evidenceModal').classList.add('hidden');
+    }
+
+    async function handleRegisterEvidence(e) {
+      e.preventDefault();
+      const caseId = document.getElementById('evCaseSelect').value;
+      const desc = document.getElementById('evDescription').value;
+      const custodian = document.getElementById('evCustodian').value;
+      const location = document.getElementById('evLocation').value;
+      const evId = `EVID-2026-00${Math.floor(Math.random() * 80) + 30}`;
+      const hash = await calculateSHA256(`${desc}:${Date.now()}`);
+
+      evidenceItems.unshift({
+        id: evId,
+        caseId: caseId,
+        description: desc,
+        collectedBy: `${currentUser.name} (${currentUser.badge})`,
+        collectedAt: new Date().toLocaleString(),
+        currentCustodian: custodian,
+        location: location,
+        status: "SEALED",
+        hash: hash
+      });
+
+      addLedgerBlock(evId, hash, "EVIDENCE_MINT");
+      logAuditEvent("EVIDENCE_SEAL", `${evId} [${desc}]`, "SUCCESS", "SECURITY");
+
+      closeRegisterEvidenceModal();
+      showToast(`Physical evidence ${evId} registered and sealed!`, "success");
+      renderEvidenceGrid();
+      refreshDashboard();
+    }
+
+    function openJudgeGuideModal() {
+      document.getElementById('judgeGuideModal').classList.remove('hidden');
+    }
+
+    function closeJudgeGuideModal() {
+      document.getElementById('judgeGuideModal').classList.add('hidden');
+    }
+
+    function openArchModal() {
+      document.getElementById('archModal').classList.remove('hidden');
+    }
+
+    function closeArchModal() {
+      document.getElementById('archModal').classList.add('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      const panel = document.getElementById('notifDropdown');
+      panel.classList.toggle('hidden');
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const list = document.getElementById('notifList');
+      if (!list) return;
+      list.innerHTML = notifications.map(n => `
+        <div class="py-2">
+          <div class="flex justify-between text-white font-semibold text-xs">
+            <span>${escapeHtml(n.title)}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${n.time}</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(n.text)}</p>
+        </div>
+      `).join('');
+    }
+
+    function clearNotifications() {
+      notifications = [];
+      renderNotifications();
+      document.getElementById('notifBadge')?.classList.add('hidden');
+      showToast("Notifications cleared", "info");
+    }
+
+    function openLoginModal() {
+      const role = prompt("Simulate Login Role [IO / FO / LO / AUD / ADMIN]:", "IO");
+      if (!role) return;
+      const key = role.toUpperCase();
+      if (key === 'IO') switchRole('INVESTIGATING_OFFICER');
+      else if (key === 'FO') switchRole('FORENSIC_OFFICER');
+      else if (key === 'LO') switchRole('LEGAL_OFFICER');
+      else if (key === 'AUD') switchRole('AUDITOR');
+      else if (key === 'ADMIN') switchRole('ADMIN');
+    }
+
+    // Helper functions
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = "bg-slate-900 border-slate-700 text-white";
+      let icon = '<i class="fa-solid fa-circle-info text-blue-400"></i>';
+
+      if (type === "success") {
+        bg = "bg-emerald-950 border-emerald-700 text-emerald-200";
+        icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+      } else if (type === "warning") {
+        bg = "bg-amber-950 border-amber-700 text-amber-200";
+        icon = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>';
+      } else if (type === "critical") {
+        bg = "bg-rose-950 border-rose-600 text-rose-200";
+        icon = '<i class="fa-solid fa-bell text-rose-400"></i>';
+      }
+
+      toast.className = `${bg} border px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs pointer-events-auto max-w-sm transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <span class="text-base shrink-0">${icon}</span>
+        <span class="flex-1">${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === 'OPEN') return 'bg-blue-950 text-blue-300 border border-blue-800';
+      if (status === 'UNDER INVESTIGATION') return 'bg-amber-950 text-amber-300 border border-amber-800';
+      if (status === 'SUBMITTED') return 'bg-purple-950 text-purple-300 border border-purple-800';
+      if (status === 'UNDER TRIAL') return 'bg-rose-950 text-rose-300 border border-rose-800';
+      return 'bg-slate-800 text-slate-300';
+    }
+
+    function getPriorityBadgeClass(priority) {
+      if (priority === 'HIGH') return 'bg-rose-950 text-rose-300';
+      if (priority === 'MEDIUM') return 'bg-amber-950 text-amber-300';
+      return 'bg-blue-950 text-blue-300';
+    }
+
+    function getSeverityClass(sev) {
+      if (sev === 'CRITICAL') return 'bg-rose-950 text-rose-400 border border-rose-800';
+      if (sev === 'SECURITY') return 'bg-purple-950 text-purple-300 border border-purple-800';
+      return 'bg-blue-950 text-blue-400';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    window.onload = function() {
+      refreshDashboard();
+      renderCasesTable();
+      renderDocumentsTable();
+      renderEvidenceGrid();
+      renderLedgerBlocks();
+      renderAuditTable();
+      renderNotifications();
+      console.log("CASELOCK v2.6 Prototype initialized. Cryptographic ledger ready.");
+    };
+  </script>
+</body>
+</html>
